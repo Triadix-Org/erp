@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class HeaderRequestOrder extends Model
@@ -43,5 +44,15 @@ class HeaderRequestOrder extends Model
     public function detail(): HasMany
     {
         return $this->hasMany(DetailRequestOrder::class);
+    }
+
+    public function req_by(): HasOne
+    {
+        return $this->hasOne(User::class, 'email', 'req_by');
+    }
+
+    public function approved_by(): HasOne
+    {
+        return $this->hasOne(User::class, 'email', 'approved_by');
     }
 }

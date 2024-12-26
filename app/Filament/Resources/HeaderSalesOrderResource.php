@@ -116,6 +116,17 @@ class HeaderSalesOrderResource extends Resource
                         3 => 'Done',
                         default => 'Unknown',
                     }),
+                Tables\Columns\TextColumn::make('app_manager')
+                    ->label('Approval')
+                    ->badge()
+                    ->colors([
+                        'success' => fn($state): bool => $state == 1,
+                        'warning' => fn($state): bool => $state == 0,
+                    ])
+                    ->formatStateUsing(fn($state) => match ($state) {
+                        0 => 'Open',
+                        1 => 'Approved'
+                    }),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -169,6 +180,37 @@ class HeaderSalesOrderResource extends Resource
                             $orderNumber = $record->code;
                             self::setStatus($orderNumber, 2);
                         }),
+                    Action::make('approve')
+                        ->label('Approve')
+                        ->icon('heroicon-o-check')
+                        ->color('success')
+                        ->requiresConfirmation()
+                        ->modalHeading('Confirmation')
+                        ->modalDescription('Are you sure you want to approve?')
+                        ->action(function ($record) {
+                            $orderNumber = $record->code;
+                            self::approve($orderNumber);
+                        })
+                        ->visible(fn($record) => $record->app_manager == 0),
+                    Action::make('cancleApprove')
+                        ->label('Cancel Approve')
+                        ->icon('heroicon-o-x-mark')
+                        ->color('danger')
+                        ->requiresConfirmation()
+                        ->modalHeading('Confirmation')
+                        ->modalDescription('Are you sure you want to cancle approve?')
+                        ->action(function ($record) {
+                            $orderNumber = $record->code;
+                            self::cancleApprove($orderNumber);
+                        })
+                        ->visible(fn($record) => $record->app_manager == 1),
+                    Action::make('print')
+                        ->label('Print')
+                        ->icon('heroicon-o-printer')
+                        ->color('info')
+                        ->url(fn($record) => route('sales.sales-order.pdf', ['orderNum' => $record->code]))
+                        ->openUrlInNewTab()
+
                 ]),
             ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
@@ -192,6 +234,56 @@ class HeaderSalesOrderResource extends Resource
 
             $record = HeaderSalesOrder::where('code', $orderNumber)->first();
             $record->status = $status;
+            $record->save();
+
+            DB::commit();
+            Notification::make()
+                ->title('Saved successfully')
+                ->success()
+                ->send();
+        } catch (Throwable $th) {
+            DB::rollBack();
+            Notification::make()
+                ->title('Opps.. Something went wrong!')
+                ->body($th->getMessage())
+                ->danger()
+                ->send();
+        }
+    }
+
+    public static function approve($orderNumber)
+    {
+        try {
+            DB::beginTransaction();
+
+            $record = HeaderSalesOrder::where('code', $orderNumber)->first();
+            $record->app_manager = 1;
+            $record->app_manager_by = Auth::user()->email;
+            $record->save();
+
+            DB::commit();
+            Notification::make()
+                ->title('Saved successfully')
+                ->success()
+                ->send();
+        } catch (Throwable $th) {
+            DB::rollBack();
+            Notification::make()
+                ->title('Opps.. Something went wrong!')
+                ->body($th->getMessage())
+                ->danger()
+                ->send();
+        }
+    }
+
+    public static function cancleApprove($orderNumber)
+    {
+        try {
+            DB::beginTransaction();
+
+            $record = HeaderSalesOrder::where('code', $orderNumber)->first();
+            $record->app_manager = 0;
+            $record->app_manager_by = null;
             $record->save();
 
             DB::commit();
