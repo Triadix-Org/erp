@@ -144,7 +144,8 @@ class HeaderRequestOrderResource extends Resource
                             $reqNumber = $record->code;
                             self::approveRequest($reqNumber);
                         })
-                        ->visible(fn($record) => $record->app_manager == 0),
+                        ->visible(fn($record) => $record->app_manager == 0 &&
+                            (Auth::user()->hasRole('super_admin') || Auth::user()->hasRole('Production Manager'))),
                     Action::make('cancelApproveRequest')
                         ->label('Cancel Approve')
                         ->icon('heroicon-o-x-mark')
@@ -156,7 +157,7 @@ class HeaderRequestOrderResource extends Resource
                             $reqNumber = $record->code;
                             self::cancelApproveRequest($reqNumber);
                         })
-                        ->visible(fn($record) => $record->app_manager == 1),
+                        ->visible(fn($record) => $record->app_manager == 1 && (Auth::user()->hasRole('super_admin') || Auth::user()->hasRole('Production Manager'))),
                     Action::make('print')
                         ->label('Print PDF')
                         ->color('info')

@@ -20,6 +20,7 @@ use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Table;
 use Icetalker\FilamentTableRepeater\Forms\Components\TableRepeater;
+use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
@@ -204,14 +205,21 @@ class HeaderSalesOrderResource extends Resource
                             self::cancleApprove($orderNumber);
                         })
                         ->visible(fn($record) => $record->app_manager == 1),
-                    Action::make('print')
-                        ->label('Print')
-                        ->icon('heroicon-o-printer')
-                        ->color('info')
-                        ->url(fn($record) => route('sales.sales-order.pdf', ['orderNum' => $record->code]))
-                        ->openUrlInNewTab()
+                ])
+                    ->tooltip('Actions'),
+                Action::make('openModal')
+                    ->label('Documents')
+                    ->icon('heroicon-s-document')
+                    ->modalContent(function ($record) {
+                        $code = $record->code;
+                        return view('filament.pages.modal', compact('code'));
+                    })
+                    ->button()
+                    ->modalCancelActionLabel('Close')
+                    ->modalHeading('Documents')
+                    ->modalSubmitAction(false)
 
-                ]),
+
             ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
