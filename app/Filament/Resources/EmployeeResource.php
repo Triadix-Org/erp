@@ -218,6 +218,13 @@ class EmployeeResource extends Resource
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\DeleteAction::make(),
                 ]),
+                Tables\Actions\Action::make('id')
+                    ->label(false)
+                    ->icon('heroicon-s-identification')
+                    ->iconSize('lg')
+                    ->tooltip('Print ID Card')
+                    ->url(fn($record) => env('APP_URL') . '/human-resource/id-card/' . $record->nip)
+                    ->openUrlInNewTab()
                 // Action::make('openModal')
                 //     ->icon('heroicon-s-user-circle')
                 //     ->iconSize('lg')

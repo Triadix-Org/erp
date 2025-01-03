@@ -7,11 +7,17 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class PdfService
 {
-    public static function generate($view, $data)
+    public static function generate($view, $data, $paper = 'A4', $orientation = 'portrait')
     {
         $company = Setting::where('company_code', 'TF')->first();
         $data['company'] = $company;
         // dd($data);
-        return Pdf::loadView($view, $data);
+        return Pdf::loadView($view, $data)
+            ->setPaper($paper, $orientation);
+    }
+
+    public static function calculateSize($num)
+    {
+        return $num / 2.54 * 72;
     }
 }

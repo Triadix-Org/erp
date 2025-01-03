@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Services\IDCard;
 use App\Http\Services\Pdf;
 
 // use App\Http\Services\Pdf\MaterialRequest;
@@ -11,3 +12,4 @@ Route::get('/sales/material-request/pdf/{orderNum}', [Pdf\MaterialRequest::class
 Route::get('/sales/sales-order/pdf/{orderNum}', [Pdf\SalesOrder::class, 'generate'])->name('sales.sales-order.pdf');
 Route::get('/purchasing/purchase-order/pdf/{orderNum}', [Pdf\PurchaseOrder::class, 'generate'])->name('purchase.purchase-order.pdf');
 Route::get('/purchasing/material-received-note/pdf/{num}', [Pdf\MaterialReceivedNote::class, 'generate'])->name('purchase.material-received-note.pdf');
+Route::get('/human-resource/id-card/{nip}', IDCard::class)->name('human-resource.id-card');
