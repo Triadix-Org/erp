@@ -4,7 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class HeaderMaterialReceived extends Model
@@ -43,5 +45,20 @@ class HeaderMaterialReceived extends Model
     public function detail(): HasMany
     {
         return $this->hasMany(DetailMaterialReceived::class);
+    }
+
+    public function po(): BelongsTo
+    {
+        return $this->belongsTo(HeaderPurchaseOrder::class, 'header_purchase_order_id', 'id');
+    }
+
+    public function supplier(): BelongsTo
+    {
+        return $this->belongsTo(Supplier::class);
+    }
+
+    public function rec_by(): HasOne
+    {
+        return $this->hasOne(User::class, 'email', 'received_by');
     }
 }

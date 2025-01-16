@@ -71,16 +71,16 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td><img class="user-sign" src="{{ public_path('storage/' . $sales_by['sign']) }}"
+                        {{-- <td><img class="user-sign" src="{{ $sales_by['sign'] ? public_path('storage/' . $sales_by['sign']) : '' }}"
                                 alt="ttd">
                         </td>
                         <td><img class="user-sign" src="{{ public_path('storage/' . $approved_by['sign']) }}"
                                 alt="ttd">
-                        </td>
+                        </td> --}}
                     </tr>
                     <tr>
                         <td>{{ $sales_by['name'] }}</td>
-                        <td>{{ $approved_by['name'] }}</td>
+                        {{-- <td>{{ $approved_by['name'] }}</td> --}}
                     </tr>
                 </tbody>
                 <tfoot>

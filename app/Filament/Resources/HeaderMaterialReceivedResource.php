@@ -90,7 +90,7 @@ class HeaderMaterialReceivedResource extends Resource
                                     }),
                                 Forms\Components\TextInput::make('received_by')
                                     ->readOnly()
-                                    ->default(Auth::user()->name)
+                                    ->default(Auth::user()->email)
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('total_items')
                                     ->required()
@@ -141,8 +141,8 @@ class HeaderMaterialReceivedResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('code')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('header_purchase_order_id')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('po.code')
+                    ->label('PO Number')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('date')
                     ->date()

@@ -9,7 +9,7 @@ class PdfService
 {
     public static function generate($view, $data, $paper = 'A4', $orientation = 'portrait')
     {
-        $company = Setting::where('company_code', 'TF')->first();
+        $company = Setting::where('company_code', 'JT')->first();
         $data['company'] = $company;
         // dd($data);
         return Pdf::loadView($view, $data)

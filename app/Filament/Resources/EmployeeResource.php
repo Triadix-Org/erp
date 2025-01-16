@@ -118,8 +118,7 @@ class EmployeeResource extends Resource
                                             ->readOnly()
                                             ->dehydrated(false)
                                             ->placeholder('Auto'),
-                                        TextInput::make('position')
-                                            ->required(),
+                                        TextInput::make('position'),
                                         TextInput::make('dept')
                                             ->label('Department'),
                                         TextInput::make('div')

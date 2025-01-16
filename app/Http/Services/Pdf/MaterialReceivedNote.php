@@ -10,13 +10,13 @@ class MaterialReceivedNote
 {
     public static function generate($num)
     {
-        $dataMrn = HeaderMaterialReceived::where('code', $num)->first();
+        $dataMrn = HeaderMaterialReceived::with('detail.product', 'po:id,code', 'supplier:id,code,name,pic', 'rec_by:id,name,email,sign')->where('code', $num)->first();
         if (!$dataMrn) {
             abort(404);
         }
         // $company
         $data = $dataMrn->toArray();
-        // dd($dataPO);
+        // dd($dataMrn);
         // $pdf = Pdf::loadView('pdf.production_order', $data);
         $pdf = PdfService::generate('pdf.material_received', $data);
         return $pdf->stream("MRN-${num}.pdf");

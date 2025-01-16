@@ -11,18 +11,19 @@
     @include('pdf.partials.header')
     <main>
         <div id="details" class="clearfix">
-            <div id="client">
-                <div class="to">REQUEST BY:</div>
-                {{-- <h2 class="name">{{ $req_by['name'] }}</h2>
-                <div class="address">Date: {{ $date }}</div>
-                <div class="address">Due Date: {{ $due_date }}</div> --}}
+            <div id="client" style="margin-top: 80px;">
+                <div class="to">SUPPLIER:</div>
+                <h2 class="name">{{ $supplier['code'] }}</h2>
+                <div class="address">{{ $supplier['name'] }}</div>
+                <div class="address">{{ $supplier['pic'] }}</div>
             </div>
             <div id="invoice">
-                <h1>MATERIAL RECEIVED NOTE</h1>
+                <h1>MATERIAL RECEIVED NOTE (TTB)</h1>
                 <div class="date">Number: {{ $code }}</div>
+                <div class="date">Date: {{ $date }}</div>
             </div>
         </div>
-        {{-- <table border="0" cellspacing="0" cellpadding="0" class="detail-table">
+        <table border="0" cellspacing="0" cellpadding="0" class="detail-table">
             <thead>
                 <tr>
                     <th style="width: 5%" class="no">#</th>
@@ -45,49 +46,45 @@
                     </tr>
                 @endforeach
             </tbody>
-        </table> --}}
+        </table>
 
         <div id="notices">
-            <div>NOTE:</div>
+            <div>COMMENT:</div>
             <div class="notice">{{ $comment }}</div>
         </div>
+        <div id="notices">
+            <div>RECEIVED CONDITION:</div>
+            <div class="notice">{{ $received_condition }}</div>
+        </div>
 
-        {{-- <div class="sign">
+        <div class="sign">
             <table class="signature-table">
                 <thead>
                     <tr>
-                        <th>Request By</th>
-                        <th>Approved By</th>
+                        <th width="60%"></th>
+                        <th>Received By</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td><img class="user-sign" src="{{ public_path('storage/' . $req_by['sign']) }}"
+                        <td></td>
+                        <td><img class="user-sign" src="{{ public_path('storage/' . $rec_by['sign']) }}"
                                 alt="ttd">
                         </td>
-                        @if ($approved_by)
-                            <td><img class="user-sign" src="{{ public_path('storage/' . $approved_by['sign']) }}"
-                                    alt="ttd"></td>
-                        @else
-                            <td></td>
-                        @endif
                     </tr>
                     <tr>
-                        <td>{{ $req_by['name'] }}</td>
-                        <td>{{ $approved_by ? $approved_by['name'] : '' }}</td>
+                        <td></td>
+                        <td>{{ $rec_by['name'] }}</td>
                     </tr>
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td>Production Staff</td>
-                        <td>Production Manager</td>
+                        <td></td>
+                        <td>Warehouse Staff</td>
                     </tr>
                 </tfoot>
             </table>
-        </div> --}}
-        {{-- <img src="data:image/png;base64, {!! base64_encode(
-            QrCode::format('png')->size(120)->generate(env('APP_URL') . 'sales/order-production/pdf/' . $code),
-        ) !!}" alt="QR Code"> --}}
+        </div>
 
     </main>
     @include('pdf.partials.footer')

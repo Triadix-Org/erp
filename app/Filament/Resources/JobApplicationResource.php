@@ -44,13 +44,18 @@ class JobApplicationResource extends Resource
                     ->numeric(),
                 Forms\Components\TextInput::make('years_of_experience')
                     ->numeric(),
-                Forms\Components\TextInput::make('resume')
+                Forms\Components\FileUpload::make('resume')
                     ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('application_letter')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('certificate')
-                    ->maxLength(255),
+                    ->directory('resume')
+                    ->openable(),
+                Forms\Components\FileUpload::make('application_letter')
+                    ->required()
+                    ->directory('application_letter')
+                    ->openable(),
+                Forms\Components\FileUpload::make('certificate')
+                    ->required()
+                    ->directory('certificate')
+                    ->openable(),
             ]);
     }
 
@@ -75,12 +80,6 @@ class JobApplicationResource extends Resource
                 Tables\Columns\TextColumn::make('years_of_experience')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('resume')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('application_letter')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('certificate')
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -98,7 +97,7 @@ class JobApplicationResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

@@ -50,17 +50,22 @@ class HeaderPurchaseOrderResource extends Resource
                 Forms\Components\TextInput::make('purchaser')
                     ->default(Auth::user()->email)
                     ->required()
+                    ->readOnly()
                     ->maxLength(255),
                 Forms\Components\Select::make('supplier_id')
-                    ->relationship('supplier')
+                    ->relationship('supplier', 'name', function ($query) {
+                        return $query->where('status', 1);
+                    })
                     ->label('Vendor/Supplier')
                     ->options(Supplier::where('status', 1)->pluck('name', 'id'))
                     ->searchable()
                     ->required(),
                 Forms\Components\Select::make('header_request_order_id')
-                    ->relationship('header_request_order')
-                    ->label('Request Order')
+                    ->relationship('header_request_order', 'code', function ($query) {
+                        return $query->where('status', 1);
+                    })
                     ->options(HeaderRequestOrder::where('status', 1)->pluck('code', 'id'))
+                    ->label('Request Order')
                     ->reactive()
                     ->searchable()
                     ->afterStateUpdated(function ($state, Set $set, Get $get) {

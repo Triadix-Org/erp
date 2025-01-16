@@ -14,6 +14,11 @@ class Employee extends Model
     public $timestamps = true;
     protected $guarded = [];
 
+    public function personnel(): BelongsTo
+    {
+        return $this->belongsTo(PersonnelData::class, 'nip', 'nip');
+    }
+
     public static function boot()
     {
         parent::boot();
@@ -46,10 +51,5 @@ class Employee extends Model
             $person->nip = $itemNumber;
             $person->save();
         });
-    }
-
-    public function personnel(): BelongsTo
-    {
-        return $this->belongsTo(PersonnelData::class, 'nip', 'nip');
     }
 }

@@ -85,9 +85,6 @@
                 </tfoot>
             </table>
         </div>
-        <div class="visible-print">
-            {!! QrCode::size(120)->generate(env('APP_URL') . 'sales/order-production/pdf/' . $code) !!}
-        </div>
         {{-- <img src="data:image/png;base64, {!! base64_encode(
             QrCode::format('png')->size(120)->generate(env('APP_URL') . 'sales/order-production/pdf/' . $code),
         ) !!}" alt="QR Code"> --}}
