@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class HeaderPurchaseOrder extends Model
@@ -51,8 +52,23 @@ class HeaderPurchaseOrder extends Model
         return $this->belongsTo(Supplier::class);
     }
 
-    public function req_order(): BelongsTo
+    public function header_request_order(): BelongsTo
     {
         return $this->belongsTo(HeaderRequestOrder::class);
+    }
+
+    public function purchaser(): HasOne
+    {
+        return $this->hasOne(User::class, 'email', 'purchaser');
+    }
+
+    public function operational(): HasOne
+    {
+        return $this->hasOne(User::class, 'email', 'operational_by');
+    }
+
+    public function finance(): HasOne
+    {
+        return $this->hasOne(User::class, 'email', 'finance_by');
     }
 }

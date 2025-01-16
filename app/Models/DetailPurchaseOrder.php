@@ -22,8 +22,8 @@ class DetailPurchaseOrder extends Model
         return $this->belongsTo(HeaderPurchaseOrder::class);
     }
 
-    public function item(): HasMany
+    public function product(): BelongsTo
     {
-        return $this->hasMany(Product::class);
+        return $this->belongsTo(Product::class);
     }
 }

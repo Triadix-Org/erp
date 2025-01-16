@@ -7,6 +7,7 @@ use App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use Filament\Forms;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -53,6 +54,15 @@ class ProductResource extends Resource
                 Forms\Components\TextInput::make('stock')
                     ->required()
                     ->numeric(),
+                Forms\Components\TextInput::make('weight')
+                    ->label('Weight (Kg)')
+                    ->required()
+                    ->numeric(),
+                Forms\Components\TextInput::make('dimension')
+                    ->label('Dimension (cm)')
+                    ->required(),
+                FileUpload::make('thumbnail')
+                    ->directory('product')
             ]);
     }
 
@@ -71,14 +81,13 @@ class ProductResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('category_code')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('unit')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('thumbnail')
-                    ->searchable(),
+                Tables\Columns\ImageColumn::make('thumbnail'),
                 Tables\Columns\ToggleColumn::make('status'),
                 Tables\Columns\TextColumn::make('stock')
                     ->numeric()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('unit')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

@@ -10,6 +10,7 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Illuminate\Support\Facades\DB;
 use Throwable;
 
 class Settings extends Page implements HasForms
@@ -67,7 +68,7 @@ class Settings extends Page implements HasForms
                                 ->label('Company Code')
                                 ->length(2)
                                 ->required()
-                                ->readOnly()
+                                // ->readOnly()
                                 ->default($this->company_code),
                             TextInput::make('brand_name')
                                 ->label('Brand Name')
@@ -106,6 +107,7 @@ class Settings extends Page implements HasForms
     public function submitForm(): void
     {
         try {
+            DB::beginTransaction();
             $setting = Setting::where('company_code', $this->company_code)->first();
 
             if ($setting) {
@@ -121,14 +123,30 @@ class Settings extends Page implements HasForms
                     'fax' => $this->fax,
                     'website' => $this->website,
                 ]);
+            } else {
+                $new = new Setting();
+                $new->company_name = $this->company_name;
+                $new->company_code = $this->company_code;
+                $new->brand_name = $this->brand_name;
+                $new->address = $this->address;
+                $new->phone_one = $this->phone_one;
+                $new->phone_two = $this->phone_two ?? '';
+                $new->email = $this->email;
+                $new->fax = $this->fax ?? '';
+                $new->website = $this->website ?? '';
+                $new->save();
             }
+
+            DB::commit();
             Notification::make()
                 ->title('Saved Successfully!')
                 ->success()
                 ->send();
         } catch (Throwable $th) {
+            DB::rollBack();
             Notification::make()
                 ->title('Opps.. Something went wrong!')
+                ->body($th->getMessage())
                 ->danger()
                 ->send();
         }

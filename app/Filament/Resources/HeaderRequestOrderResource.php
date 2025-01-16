@@ -20,7 +20,9 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Table;
 use Icetalker\FilamentTableRepeater\Forms\Components\TableRepeater;
 use Illuminate\Database\Eloquent\Builder;
@@ -34,9 +36,9 @@ class HeaderRequestOrderResource extends Resource
     protected static ?string $model = HeaderRequestOrder::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationLabel = 'Request Order';
+    protected static ?string $navigationLabel = 'Material Request';
     protected static ?string $navigationGroup = 'Production';
-    protected static ?string $label = 'Request Order';
+    protected static ?string $label = 'Material Request';
 
     public static function form(Form $form): Form
     {
@@ -63,7 +65,7 @@ class HeaderRequestOrderResource extends Resource
                                 Select::make('product_id')
                                     ->label('Product')
                                     ->relationship(
-                                        name: 'item',
+                                        name: 'product',
                                         titleAttribute: 'name',
                                         modifyQueryUsing: fn(Builder $query) => $query->where('status', 1),
                                     )
@@ -128,33 +130,42 @@ class HeaderRequestOrderResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                DeleteAction::make(),
-                Action::make('approveRequest')
-                    ->label('Approve')
-                    ->icon('heroicon-o-check')
-                    ->color('success')
-                    ->requiresConfirmation()
-                    ->modalHeading('Confirmation')
-                    ->modalDescription('Are you sure you want to approve?')
-                    ->action(function ($record) {
-                        $reqNumber = $record->code;
-                        self::approveRequest($reqNumber);
-                    })
-                    ->visible(fn($record) => $record->app_manager == 0),
-                Action::make('cancelApproveRequest')
-                    ->label('Cancel Approve')
-                    ->icon('heroicon-o-x-mark')
-                    ->color('warning')
-                    ->requiresConfirmation()
-                    ->modalHeading('Confirmation')
-                    ->modalDescription('Are you sure you want to cancel approve?')
-                    ->action(function ($record) {
-                        $reqNumber = $record->code;
-                        self::cancelApproveRequest($reqNumber);
-                    })
-                    ->visible(fn($record) => $record->app_manager == 1),
-            ])
+                ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+                    DeleteAction::make(),
+                    Action::make('approveRequest')
+                        ->label('Approve')
+                        ->icon('heroicon-o-check')
+                        ->color('success')
+                        ->requiresConfirmation()
+                        ->modalHeading('Confirmation')
+                        ->modalDescription('Are you sure you want to approve?')
+                        ->action(function ($record) {
+                            $reqNumber = $record->code;
+                            self::approveRequest($reqNumber);
+                        })
+                        ->visible(fn($record) => $record->app_manager == 0 &&
+                            (Auth::user()->hasRole('super_admin') || Auth::user()->hasRole('Production Manager'))),
+                    Action::make('cancelApproveRequest')
+                        ->label('Cancel Approve')
+                        ->icon('heroicon-o-x-mark')
+                        ->color('warning')
+                        ->requiresConfirmation()
+                        ->modalHeading('Confirmation')
+                        ->modalDescription('Are you sure you want to cancel approve?')
+                        ->action(function ($record) {
+                            $reqNumber = $record->code;
+                            self::cancelApproveRequest($reqNumber);
+                        })
+                        ->visible(fn($record) => $record->app_manager == 1 && (Auth::user()->hasRole('super_admin') || Auth::user()->hasRole('Production Manager'))),
+                    Action::make('print')
+                        ->label('Print PDF')
+                        ->color('info')
+                        ->icon('heroicon-o-printer')
+                        ->url(fn($record) => env('APP_URL') . '/sales/material-request/pdf/' . $record->code)
+                        ->openUrlInNewTab()
+                ])
+            ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
