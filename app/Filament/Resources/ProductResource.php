@@ -54,6 +54,13 @@ class ProductResource extends Resource
                 Forms\Components\TextInput::make('stock')
                     ->required()
                     ->numeric(),
+                Forms\Components\TextInput::make('weight')
+                    ->label('Weight (Kg)')
+                    ->required()
+                    ->numeric(),
+                Forms\Components\TextInput::make('dimension')
+                    ->label('Dimension (cm)')
+                    ->required(),
                 FileUpload::make('thumbnail')
                     ->directory('product')
             ]);
