@@ -9,10 +9,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 
-class Invoice extends Model
+class Quotation extends Model
 {
-    use HasFactory;
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     public $timestamps = true;
     protected $guarded = [];
@@ -21,12 +20,12 @@ class Invoice extends Model
     {
         parent::boot();
         static::creating(function ($model) {
-            $lastest = self::orderBy('inv_no', 'desc')
+            $lastest = self::orderBy('code', 'desc')
                 ->first();
-            $code = 'INV' . date('Y') . date('m');
+            $code = 'QT' . date('Y') . date('m');
 
             if ($lastest) {
-                $lastNumber = (int) substr($lastest->inv_no, strlen($code));
+                $lastNumber = (int) substr($lastest->code, strlen($code));
                 $newNumber = $lastNumber + 1;
             } else {
                 // Jika belum ada data, mulai dari 1
@@ -40,18 +39,18 @@ class Invoice extends Model
         });
     }
 
-    public function customer(): BelongsTo
+    public function details(): HasMany
+    {
+        return $this->hasMany(DetailQuotation::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function costumer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
-    }
-
-    public function headerSalesOrder(): BelongsTo
-    {
-        return $this->belongsTo(HeaderSalesOrder::class);
-    }
-
-    public function detail(): HasMany
-    {
-        return $this->hasMany(DetailInvoice::class);
     }
 }
