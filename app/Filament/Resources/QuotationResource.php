@@ -14,6 +14,8 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -45,7 +47,7 @@ class QuotationResource extends Resource
                                     ->required()
                                     ->default(now())
                             ]),
-                        TableRepeater::make('Details')
+                        TableRepeater::make('detail')
                             ->label('Product/Item')
                             ->relationship('details')
                             ->addActionLabel('Add Product')
@@ -55,6 +57,11 @@ class QuotationResource extends Resource
                                     ->label('Product')
                                     ->searchable()
                                     ->options(Product::pluck('name', 'id'))
+                                    ->reactive()
+                                    ->afterStateUpdated(function ($state, Get $get, Set $set) {
+                                        $product = Product::find($state);
+                                        $set('unit_price', $product->price);
+                                    })
                                     ->required(),
                                 TextInput::make('unit_price')
                                     ->numeric()
@@ -62,13 +69,21 @@ class QuotationResource extends Resource
                                     ->reactive()
                                     ->readOnly(),
                                 TextInput::make('qty')
-                                    ->readOnly()
+                                    ->reactive()
+                                    ->afterStateUpdated(function ($state, Get $get, Set $set) {
+                                        $total_price = $get('unit_price') * $state;
+                                        $set('total_price', $total_price);
+                                        // self::updatedDetails($set, $get);
+                                    })
                                     ->numeric(),
                                 TextInput::make('total_price')
                                     ->numeric()
                                     ->readOnly()
                                     ->reactive()
                             ])
+                            ->afterStateUpdated(function ($state, Set $set, Get $get) {
+                                self::updatedDetails($set, $get);
+                            })
                             ->colStyles(function () {
                                 return [
                                     'product_id' => 'width: 45%; font-size:12px;',
@@ -76,9 +91,57 @@ class QuotationResource extends Resource
                                     'qty' => 'width: 15%; font-size:12px;',
                                     'total_price' => 'width: 20%; font-size:12px;',
                                 ];
-                            })
+                            }),
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('tax')
+                                    ->numeric()
+                                    ->required()
+                                    ->reactive()
+                                    ->afterStateUpdated(function ($state, Set $set, Get $get) {
+                                        self::updatedDetails($set, $get);
+                                    })
+                                    ->default(0),
+                                TextInput::make('shipment_price')
+                                    ->numeric()
+                                    ->required()
+                                    ->reactive()
+                                    ->afterStateUpdated(function ($state, Set $set, Get $get) {
+                                        self::updatedDetails($set, $get);
+                                    })
+                                    ->default(0),
+                                TextInput::make('other_price')
+                                    ->numeric()
+                                    ->required()
+                                    ->reactive()
+                                    ->afterStateUpdated(function ($state, Set $set, Get $get) {
+                                        self::updatedDetails($set, $get);
+                                    })
+                                    ->default(0),
+                                TextInput::make('total_amount')
+                                    ->numeric()
+                                    ->required()
+                                    ->default(0),
+                            ]),
                     ])
             ]);
+    }
+
+    public static function updatedDetails($set, $get)
+    {
+        $details = collect($get('detail'))->filter(fn($item) => !empty($item['product_id']) && !empty($item['qty']));
+        $prices = Product::find($details->pluck('product_id'))->pluck('price', 'id');
+        $tax = $get('tax') == null ? 0 : $get('tax');
+        $shipPrice = $get('shipment_price') == null ? 0 : $get('shipment_price');
+        $otherPrice = $get('other_price') == null ? 0 : $get('other_price');
+
+        $subtotal = $details->reduce(function ($subtotal, $product) use ($prices) {
+            return $subtotal + ($prices[$product['product_id']] * $product['qty']);
+        }, 0);
+
+        $total = $subtotal + $tax + $shipPrice + $otherPrice;
+
+        $set('total_amount', $total);
     }
 
     public static function table(Table $table): Table

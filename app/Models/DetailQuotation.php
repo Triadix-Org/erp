@@ -18,4 +18,9 @@ class DetailQuotation extends Model
     {
         return $this->belongsTo(Product::class);
     }
+
+    public function quotation(): BelongsTo
+    {
+        return $this->belongsTo(Quotation::class);
+    }
 }

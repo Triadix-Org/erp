@@ -34,7 +34,7 @@ class Quotation extends Model
 
             // Format angka dengan leading zero (pad dengan 6 digit)
             $itemNumber = $code . str_pad($newNumber, 6, '0', STR_PAD_LEFT);
-            $model->inv_no          = $itemNumber;
+            $model->code          = $itemNumber;
             $model->user_id         = Auth::user()->id;
         });
     }
@@ -49,7 +49,7 @@ class Quotation extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function costumer(): BelongsTo
+    public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
     }
