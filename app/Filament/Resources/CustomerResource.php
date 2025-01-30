@@ -3,12 +3,14 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CustomerResource\Pages;
-use App\Filament\Resources\CustomerResource\RelationManagers;
 use App\Models\Customer;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -82,9 +84,17 @@ class CustomerResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-            ])
+                ActionGroup::make([
+                    Action::make('customer_history')
+                        ->label('Order history')
+                        ->icon('heroicon-s-queue-list')
+                        ->url(fn(Customer $record) => route('filament.root.resources.customers.history', ['record' => $record]))
+                        ->color('primary'),
+                    Tables\Actions\EditAction::make()
+                        ->color('info'),
+                    Tables\Actions\DeleteAction::make(),
+                ])
+            ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
@@ -96,6 +106,7 @@ class CustomerResource extends Resource
     {
         return [
             'index' => Pages\ManageCustomers::route('/'),
+            'history' => Pages\CustomerOrderHistory::route('/{record}/history')
         ];
     }
 }

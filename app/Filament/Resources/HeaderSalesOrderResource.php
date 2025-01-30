@@ -210,15 +210,12 @@ class HeaderSalesOrderResource extends Resource
                 Action::make('openModal')
                     ->label('Documents')
                     ->icon('heroicon-s-document')
-                    ->modalContent(function ($record) {
+                    ->url(function ($record) {
                         $code = $record->code;
-                        return view('filament.pages.modal', compact('code'));
+                        return url('sales/sales-order/pdf') . '/' . $code;
                     })
+                    ->openUrlInNewTab()
                     ->button()
-                    ->modalCancelActionLabel('Close')
-                    ->modalHeading('Documents')
-                    ->modalSubmitAction(false)
-
 
             ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([

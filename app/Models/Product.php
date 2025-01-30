@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
@@ -23,5 +24,10 @@ class Product extends Model
             $code = $lastest ? (int) substr($lastest->code, 2) + 1 : 1;
             $model->code = 'IT' . str_pad($code, 7, '0', STR_PAD_LEFT);
         });
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(ProductCategory::class, 'category_code', 'code');
     }
 }

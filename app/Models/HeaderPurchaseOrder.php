@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enum\PaymentStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,6 +18,11 @@ class HeaderPurchaseOrder extends Model
     protected $table = "header_purchase_orders";
     public $timestamps = true;
     protected $guarded = [];
+
+    protected $casts = [
+        'po_date' => 'datetime',
+        'payment_due' => 'date',
+    ];
 
     public static function boot()
     {
@@ -39,6 +45,10 @@ class HeaderPurchaseOrder extends Model
             // Format angka dengan leading zero (pad dengan 6 digit)
             $itemNumber = $code . str_pad($newNumber, 6, '0', STR_PAD_LEFT);
             $model->code = $itemNumber;
+
+            $mrn = HeaderRequestOrder::find($model->header_request_order_id);
+            $mrn->proses = 1;
+            $mrn->save();
         });
     }
 
