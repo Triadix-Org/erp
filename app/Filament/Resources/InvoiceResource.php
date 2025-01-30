@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enum\PaymentStatus;
 use App\Filament\Resources\InvoiceResource\Pages;
 use App\Filament\Resources\InvoiceResource\RelationManagers;
 use App\Models\Customer;
@@ -101,11 +102,6 @@ class InvoiceResource extends Resource
                                             ->label('Product')
                                             // ->searchable()
                                             ->options(Product::pluck('name', 'id'))
-                                            // ->reactive()
-                                            // ->afterStateUpdated(function ($state, Set $set, Get $get) {
-                                            //     $product = Product::find($state);
-                                            //     $set('price', $product->price);
-                                            // })
                                             ->required(),
                                         TextInput::make('price')
                                             ->numeric()
@@ -116,31 +112,10 @@ class InvoiceResource extends Resource
                                         TextInput::make('qty')
                                             ->readOnly()
                                             ->numeric(),
-                                        // ->reactive()
-                                        // ->afterStateUpdated(function ($state, Set $set, Get $get) {
-                                        //     $price = $get('price');
-                                        //     $total = $price * $state;
-                                        //     $set('price_total', $total);
-
-                                        //     $details = collect($get('details'));
-
-                                        //     $set('details', $details->map(fn($detail) => [
-                                        //         'product_id' => $detail->product_id,
-                                        //         'price' => $detail->product->price,
-                                        //         'qty' => $detail->qty,
-                                        //         'price_total' => $detail->product->price * $detail->qty
-                                        //     ]));
-                                        //     Log::info('Details =>', $details->toArray());
-
-                                        //     self::updatedDetails($set, $get);
-                                        // }),
                                         TextInput::make('price_total')
                                             ->numeric()
                                             ->readOnly()
                                             ->reactive()
-                                        // ->afterStateUpdated(function ($state, Set $set, Get $get) {
-                                        //     self::updatedDetails($set, $get);
-                                        // })
                                     ])
                                     ->reorderable()
                                     ->addable(false)
@@ -161,10 +136,12 @@ class InvoiceResource extends Resource
                                             ->afterStateUpdated(function (Set $set, Get $get) {
                                                 self::updatedDetails($set, $get);
                                             })
+                                            ->debounce(1000)
                                             ->default(0),
                                         TextInput::make('total_amount')
                                             ->numeric()
                                             ->required()
+                                            ->readOnly()
                                             ->default(0),
 
                                         Textarea::make('payment_terms')
@@ -217,7 +194,12 @@ class InvoiceResource extends Resource
                 TextColumn::make('ship_date')
                     ->formatStateUsing(fn($state) => Carbon::parse($state)->locale('id')->translatedFormat('d F Y')),
                 TextColumn::make('destination_country'),
-                TextColumn::make('headerSalesOrder.code'),
+                TextColumn::make('headerSalesOrder.code')
+                    ->label('Sales order'),
+                TextColumn::make('payment_status')
+                    ->badge()
+                    ->formatStateUsing(fn($state) => PaymentStatus::tryFrom($state)?->label() ?? '-')
+                    ->color(fn($state) => PaymentStatus::tryFrom($state)?->color() ?? 'gray'),
             ])
             ->filters([
                 //
@@ -279,8 +261,6 @@ class InvoiceResource extends Resource
         }, 0);
 
         $totalAmount = $totalPrice + $tax + $shipPrice;
-
-        Log::info('Data:', $details->toArray());
 
         $set('total_amount', $totalAmount);
     }

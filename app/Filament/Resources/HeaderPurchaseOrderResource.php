@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enum\PaymentStatus;
 use App\Filament\Resources\HeaderPurchaseOrderResource\Pages;
 use App\Filament\Resources\HeaderPurchaseOrderResource\RelationManagers;
 use App\Models\DetailRequestOrder;
@@ -12,6 +13,8 @@ use App\Models\Supplier;
 use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -23,6 +26,7 @@ use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Enums\ActionsPosition;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Icetalker\FilamentTableRepeater\Forms\Components\TableRepeater;
 use Illuminate\Database\Eloquent\Builder;
@@ -44,162 +48,141 @@ class HeaderPurchaseOrderResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\DateTimePicker::make('po_date')
-                    ->default(Carbon::now())
-                    ->required(),
-                Forms\Components\TextInput::make('purchaser')
-                    ->default(Auth::user()->email)
-                    ->required()
-                    ->readOnly()
-                    ->maxLength(255),
-                Forms\Components\Select::make('supplier_id')
-                    ->relationship('supplier', 'name', function ($query) {
-                        return $query->where('status', 1);
-                    })
-                    ->label('Vendor/Supplier')
-                    ->options(Supplier::where('status', 1)->pluck('name', 'id'))
-                    ->searchable()
-                    ->required(),
-                Forms\Components\Select::make('header_request_order_id')
-                    ->relationship('header_request_order', 'code', function ($query) {
-                        return $query->where('status', 1);
-                    })
-                    ->options(HeaderRequestOrder::where('status', 1)->pluck('code', 'id'))
-                    ->label('Request Order')
-                    ->reactive()
-                    ->searchable()
-                    ->afterStateUpdated(function ($state, Set $set, Get $get) {
-                        self::updateTotals($get, $set);
-                        $headerRequestOrderId = $get('header_request_order_id');
-
-                        if ($headerRequestOrderId) {
-                            $details = DetailRequestOrder::with('product:id,price')->where('header_request_order_id', $headerRequestOrderId)->get();
-                            // dd($details);
-
-                            $set('details', $details->map(fn($detail) => [
-                                $total = $detail->product->price * $detail->qty,
-                                'product_id' => $detail->product_id,
-                                'price' => $detail->product->price,
-                                'qty' => $detail->qty,
-                                'total' => $total,
-                                'total_price_line' => $total
-                            ])->toArray());
-                        } else {
-                            $set('details', []);
-                        }
-                    }),
-                Forms\Components\Textarea::make('payment_terms')
-                    ->cols(3),
-                Forms\Components\Textarea::make('incoterms')
-                    ->cols(3),
-                TableRepeater::make('details')
-                    ->relationship('detail')
+                Section::make()
                     ->schema([
-                        Select::make('product_id')
-                            ->label('Product')
-                            ->reactive()
-                            ->relationship(
-                                name: 'product',
-                                titleAttribute: 'name',
-                                modifyQueryUsing: fn(Builder $query) => $query->where('status', 1),
-                            )
-                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                $productId = $get('product_id');
-                                if ($productId) {
-                                    $product = Product::where('id', $productId)->first();
-                                    $set('price', $product->price);
-                                }
-                            })
-                            ->required(),
+                        Grid::make(3)
+                            ->schema([
+                                Forms\Components\DateTimePicker::make('po_date')
+                                    ->default(Carbon::now())
+                                    ->required(),
+                                Forms\Components\TextInput::make('purchaser')
+                                    ->default(Auth::user()->email)
+                                    ->required()
+                                    ->readOnly()
+                                    ->maxLength(255),
+                                Forms\Components\Select::make('supplier_id')
+                                    ->relationship('supplier', 'name', function ($query) {
+                                        return $query->where('status', 1);
+                                    })
+                                    ->label('Vendor/Supplier')
+                                    ->options(Supplier::where('status', 1)->pluck('name', 'id'))
+                                    ->searchable()
+                                    ->required(),
+                                Forms\Components\Select::make('header_request_order_id')
+                                    ->relationship('header_request_order', 'code', function ($query) {
+                                        return $query->where('status', 1);
+                                    })
+                                    ->options(HeaderRequestOrder::where('status', 1)->pluck('code', 'id'))
+                                    ->label('Request Order')
+                                    ->reactive()
+                                    ->searchable()
+                                    ->afterStateUpdated(function ($state, Set $set, Get $get) {
+                                        $headerRequestOrderId = $get('header_request_order_id');
 
-                        TextInput::make('price')
-                            ->prefix('Rp.')
-                            ->label('Price/unit')
-                            ->numeric()
-                            ->dehydrated(false)
-                            ->readOnly(),
+                                        if ($headerRequestOrderId) {
+                                            $details = DetailRequestOrder::with('product:id,price')->where('header_request_order_id', $headerRequestOrderId)->get();
+                                            // dd($details);
 
-                        TextInput::make('qty')
-                            ->numeric()
-                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                $qty = $get('qty');
-                                $price = $get('price');
-                                if ($qty) {
-                                    $total = $qty * $price;
-                                    $set('total_price_line', $total);
-                                    $set('total', $total);
-                                }
-                            })
-                            ->reactive(),
+                                            $set('details', $details->map(fn($detail) => [
+                                                $total = $detail->product->price * $detail->qty,
+                                                'product_id' => $detail->product_id,
+                                                'price' => $detail->product->price,
+                                                'qty' => $detail->qty,
+                                                'total' => $total
+                                            ])->toArray());
+                                            self::updateTotals($get, $set);
+                                        } else {
+                                            $set('details', []);
+                                        }
+                                    }),
+                                Forms\Components\DatePicker::make('payment_due')
+                                    ->required(),
+                                Forms\Components\Textarea::make('payment_terms')
+                                    ->cols(3),
+                                Forms\Components\Textarea::make('incoterms')
+                                    ->cols(3),
+                            ]),
+                        TableRepeater::make('details')
+                            ->relationship('detail')
+                            ->schema([
+                                Select::make('product_id')
+                                    ->label('Product')
+                                    ->reactive()
+                                    ->relationship(
+                                        name: 'product',
+                                        titleAttribute: 'name',
+                                        modifyQueryUsing: fn(Builder $query) => $query->where('status', 1),
+                                    )
+                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                        $productId = $get('product_id');
+                                        if ($productId) {
+                                            $product = Product::where('id', $productId)->first();
+                                            $set('price', $product->price);
+                                        }
+                                    })
+                                    ->required(),
 
-                        TextInput::make('total_price_line')
-                            ->prefix('Rp.')
-                            ->label('Price')
-                            ->dehydrated(false)
-                            ->numeric()
-                            ->readOnly(),
+                                TextInput::make('price')
+                                    ->prefix('Rp.')
+                                    ->label('Price/unit')
+                                    ->numeric()
+                                    ->dehydrated(false)
+                                    ->readOnly(),
 
-                        Checkbox::make('tax')
-                            ->label('Tax')
-                            ->reactive()
-                            ->dehydrated(false)
-                            ->afterStateUpdated(function ($state, callable $set, $get) {
-                                if ($state == true) {
-                                    $price = $get('price');
-                                    $qty = $get('qty');
-                                    $taxAmount = 0.12 * ($price * $qty);
-                                    $set('tax_rp', $taxAmount);
-                                    $totalPrice = ($price * $qty) + $taxAmount;
-                                    $set('total', $totalPrice);
-                                } else {
-                                    $price = $get('price');
-                                    $qty = $get('qty');
-                                    $taxAmount = 0;
-                                    $set('tax_rp', $taxAmount);
-                                    $totalPrice = ($price * $qty) - $taxAmount;
-                                    $set('total', $totalPrice);
-                                }
+                                TextInput::make('qty')
+                                    ->numeric()
+                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                        $qty = $get('qty');
+                                        $price = $get('price');
+                                        if ($qty) {
+                                            $total = $qty * $price;
+                                            $set('total_price_line', $total);
+                                            $set('total', $total);
+                                        }
+                                    })
+                                    ->reactive(),
+                                TextInput::make('total')
+                                    ->prefix('Rp.')
+                                    ->numeric()
+                                    ->readOnly(),
 
-                                // self::updateTotals($get, $set);
-                            }),
-                        TextInput::make('tax_rp')
-                            ->label('Tax Amount')
-                            ->prefix('Rp.')
-                            ->default(0)
-                            ->numeric()
-                            ->reactive()
-                            // ->afterStateUpdated(function (Get $get, Set $set) {
-                            //     self::updateTotals($get, $set);
-                            // })
-                            ->readOnly(),
-                        TextInput::make('total')
-                            ->prefix('Rp.')
-                            ->numeric()
-                            ->readOnly(),
-
+                            ])
+                            ->reorderable()
+                            ->addable(false)
+                            ->columnSpan('full'),
+                        Grid::make()
+                            ->schema([
+                                Forms\Components\TextInput::make('subtotal')
+                                    ->required()
+                                    ->readOnly()
+                                    ->numeric()
+                                    ->default(0),
+                                Forms\Components\TextInput::make('total_tax')
+                                    ->required()
+                                    ->reactive()
+                                    ->afterStateUpdated(function (Get $get, Set $set) {
+                                        self::updateTotals($get, $set);
+                                    })
+                                    ->debounce(1000)
+                                    ->numeric()
+                                    ->default(0),
+                                Forms\Components\TextInput::make('total_disc')
+                                    ->required()
+                                    ->label('Discount')
+                                    ->numeric()
+                                    ->reactive()
+                                    ->afterStateUpdated(function (Get $get, Set $set) {
+                                        self::updateTotals($get, $set);
+                                    })
+                                    ->debounce(1000)
+                                    ->default(0),
+                                Forms\Components\TextInput::make('total_amount')
+                                    ->required()
+                                    ->numeric()
+                                    ->readOnly()
+                                    ->default(0),
+                            ])
                     ])
-                    ->reorderable()
-                    ->reactive()
-                    ->afterStateUpdated(function (Get $get, Set $set) {
-                        self::updateTotals($get, $set);
-                    })
-                    ->columnSpan('full'),
-                Forms\Components\TextInput::make('subtotal')
-                    ->required()
-                    ->numeric()
-                    ->default(0),
-                Forms\Components\TextInput::make('total_tax')
-                    ->required()
-                    ->numeric()
-                    ->default(0),
-                Forms\Components\TextInput::make('total_disc')
-                    ->required()
-                    ->numeric()
-                    ->default(0),
-                Forms\Components\TextInput::make('total_amount')
-                    ->required()
-                    ->numeric()
-                    ->default(0),
             ]);
     }
 
@@ -220,8 +203,10 @@ class HeaderPurchaseOrderResource extends Resource
                     ->label('Req Number'),
                 Tables\Columns\TextColumn::make('payment_terms')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('incoterms')
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('payment_status')
+                    ->badge()
+                    ->formatStateUsing(fn($state) => PaymentStatus::tryFrom($state)?->label() ?? '-')
+                    ->color(fn($state) => PaymentStatus::tryFrom($state)?->color() ?? 'gray'),
                 Tables\Columns\TextColumn::make('app_operational')
                     ->label('Approval Operational')
                     ->badge()
@@ -278,7 +263,8 @@ class HeaderPurchaseOrderResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                SelectFilter::make('payment_status')
+                    ->options(PaymentStatus::labels())
             ])
             ->actions([
                 ActionGroup::make([
@@ -367,23 +353,19 @@ class HeaderPurchaseOrderResource extends Resource
         ];
     }
 
-    public static function updateTotals(Get $get, Set $set)
+    public static function updateTotals($get, $set)
     {
-        // dd('ada');
-        $selectedProducts = collect($get('details'))->filter(fn($productId) => !empty($productId['product_id']));
-        // $prices = $get('price');
-        // dd($selectedProducts);
+        $details = collect($get('details'));
+        $tax = $get('total_tax');
+        $disc = $get('total_disc');
 
-        $asubtotal = $selectedProducts->reduce(function ($subtotal, $product) {
-            return $subtotal + ($product['price'] * $product['qty']);
-        }, 0);
-        // dd($asubtotal);
-
-        $subtotal = $selectedProducts->reduce(function ($subtotal, $product) {
-            return $subtotal + ($product['price'] * $product['qty']);
+        $totalPrice = $details->reduce(function ($total, $line) {
+            return $total + $line['total'];
         }, 0);
 
-        $set('subtotal', $asubtotal);
+        $subtotal = $totalPrice + $tax - $disc;
+
+        $set('subtotal', $totalPrice);
         $set('total_amount', $subtotal);
     }
 

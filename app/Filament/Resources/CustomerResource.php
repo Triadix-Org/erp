@@ -88,7 +88,7 @@ class CustomerResource extends Resource
                     Action::make('customer_history')
                         ->label('Order history')
                         ->icon('heroicon-s-queue-list')
-                        ->url(fn(Customer $record) => route('filament.root.resources.customers.history', ['record' => $record->id]))
+                        ->url(fn(Customer $record) => route('filament.root.resources.customers.history', ['record' => $record]))
                         ->color('primary'),
                     Tables\Actions\EditAction::make()
                         ->color('info'),

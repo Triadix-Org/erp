@@ -18,6 +18,9 @@ use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Table;
 use Icetalker\FilamentTableRepeater\Forms\Components\TableRepeater;
 use Illuminate\Database\Eloquent\Builder;
@@ -150,7 +153,7 @@ class QuotationResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('code')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('customer_id')
+                Tables\Columns\TextColumn::make('customer.name')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('user.name')
@@ -171,9 +174,7 @@ class QuotationResource extends Resource
                 Tables\Columns\TextColumn::make('total_amount')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('status')
-                    ->numeric()
-                    ->sortable(),
+                Tables\Columns\ToggleColumn::make('status'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -191,8 +192,12 @@ class QuotationResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
+                ActionGroup::make([
+                    Tables\Actions\EditAction::make()
+                        ->color('info'),
+                    DeleteAction::make()
+                ])
+            ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),

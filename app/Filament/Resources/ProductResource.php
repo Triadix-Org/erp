@@ -11,6 +11,7 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -79,7 +80,7 @@ class ProductResource extends Resource
                 Tables\Columns\TextColumn::make('price')
                     ->label('Price (Rp)')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('category_code')
+                Tables\Columns\TextColumn::make('category.name')
                     ->searchable(),
                 Tables\Columns\ImageColumn::make('thumbnail'),
                 Tables\Columns\ToggleColumn::make('status'),
@@ -102,7 +103,8 @@ class ProductResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                SelectFilter::make('category')
+                    ->relationship('category', 'name')
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
