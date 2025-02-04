@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Enum\OutcomeType;
 use App\Filament\Resources\OutcomeResource\Pages;
 use App\Filament\Resources\OutcomeResource\RelationManagers;
+use App\Filament\Resources\OutcomeResource\Widgets\Outcome as WidgetsOutcome;
 use App\Models\Outcome;
 use Carbon\Carbon;
 use Filament\Forms;
@@ -122,10 +123,10 @@ class OutcomeResource extends Resource
             ]);
     }
 
-    public static function getRelations(): array
+    public static function getWidgets(): array
     {
         return [
-            //
+            WidgetsOutcome::class
         ];
     }
 
