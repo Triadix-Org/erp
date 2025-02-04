@@ -9,6 +9,7 @@ use App\Filament\Resources\AccountPayableResource\RelationManagers;
 use App\Models\AccountsPayable;
 use App\Models\HeaderPurchaseOrder;
 use App\Models\Outcome;
+use App\Models\Supplier;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Fieldset;
@@ -99,8 +100,11 @@ class AccountPayableResource extends Resource
                     ]),
                 Filter::make('due_date')
                     ->form([
-                        DatePicker::make('date_from')->label('Due Date From'),
-                        DatePicker::make('date_until')->label('Due Date Until'),
+                        Section::make('Due Date Range')
+                            ->schema([
+                                DatePicker::make('date_from')->label('Due Date From'),
+                                DatePicker::make('date_until')->label('Due Date Until'),
+                            ])
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
@@ -189,7 +193,9 @@ class AccountPayableResource extends Resource
                         $record->status = 1;
                         $record->save();
 
-                        DB::transaction(function () use ($record) {
+                        $supplier = Supplier::find($record->supplier_id);
+
+                        DB::transaction(function () use ($record, $supplier) {
                             $purchaseOrder = HeaderPurchaseOrder::find($record->header_purchase_order_id);
                             if ($purchaseOrder) {
                                 $purchaseOrder->payment_status = 1;
@@ -201,7 +207,7 @@ class AccountPayableResource extends Resource
                             $outcome->date      = now();
                             $outcome->amount    = $record->amount;
                             $outcome->type      = OutcomeType::OTHER;
-                            $outcome->pay_to    = $record->supplier_id;
+                            $outcome->pay_to    = $supplier->name;
                             $outcome->status    = 1;
                             $outcome->save();
                         });
