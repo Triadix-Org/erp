@@ -2,13 +2,18 @@
 
 namespace App\Filament\Resources;
 
+use App\Enum\PaymentStatus;
 use App\Filament\Resources\AccountsReceivableResource\Pages;
 use App\Filament\Resources\AccountsReceivableResource\RelationManagers;
 use App\Models\AccountsReceivable;
 use Filament\Forms;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -24,27 +29,27 @@ class AccountsReceivableResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('invoice_id')
+                TextInput::make('invoice_id')
                     ->required()
                     ->numeric(),
-                Forms\Components\TextInput::make('customer_id')
+                TextInput::make('customer_id')
                     ->required()
                     ->numeric(),
-                Forms\Components\DatePicker::make('date')
+                DatePicker::make('date')
                     ->required(),
-                Forms\Components\DatePicker::make('due_date')
+                DatePicker::make('due_date')
                     ->required(),
-                Forms\Components\TextInput::make('amount')
+                TextInput::make('amount')
                     ->required()
                     ->numeric()
                     ->default(0),
-                Forms\Components\TextInput::make('status')
+                TextInput::make('status')
                     ->required()
                     ->numeric()
                     ->default(0),
-                Forms\Components\TextInput::make('attach')
+                TextInput::make('attach')
                     ->maxLength(255),
-                Forms\Components\DatePicker::make('payment_date'),
+                DatePicker::make('payment_date'),
             ]);
     }
 
@@ -52,38 +57,37 @@ class AccountsReceivableResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('invoice_id')
+                TextColumn::make('invoice.inv_no')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('customer_id')
-                    ->numeric()
+                TextColumn::make('customer.name')
+                    ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('date')
+                TextColumn::make('date')
                     ->date()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('due_date')
+                TextColumn::make('due_date')
                     ->date()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('amount')
-                    ->numeric()
+                TextColumn::make('amount')
+                    ->money('idr')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('status')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('attach')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('payment_date')
+                TextColumn::make('status')
+                    ->badge()
+                    ->formatStateUsing(fn($state) => PaymentStatus::tryFrom($state)?->label() ?? '-')
+                    ->color(fn($state) => PaymentStatus::tryFrom($state)?->color() ?? 'gray'),
+                TextColumn::make('payment_date')
                     ->date()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -94,12 +98,7 @@ class AccountsReceivableResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
+            ], position: ActionsPosition::BeforeColumns);
     }
 
     public static function getPages(): array
