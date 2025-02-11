@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers;
+use App\Filament\Resources\ProductResource\Widgets\Product as ProductWidget;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use Filament\Forms;
@@ -117,10 +118,18 @@ class ProductResource extends Resource
             ]);
     }
 
+    public static function getWidgets(): array
+    {
+        return [
+            ProductWidget::class
+        ];
+    }
+
     public static function getPages(): array
     {
         return [
             'index' => Pages\ManageProducts::route('/'),
+            'stock-opname' => Pages\StockOpname::route('/stock-opname'),
         ];
     }
 }
