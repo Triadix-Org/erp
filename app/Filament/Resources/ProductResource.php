@@ -129,7 +129,6 @@ class ProductResource extends Resource
     {
         return [
             'index' => Pages\ManageProducts::route('/'),
-            'stock-opname' => Pages\StockOpname::route('/stock-opname'),
         ];
     }
 }

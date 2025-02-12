@@ -16,9 +16,6 @@ class ManageProducts extends ManageRecords
     {
         return [
             Actions\CreateAction::make(),
-            Action::make('stockOpname')
-                ->label('Stock Opname/Adjustment')
-                ->url(route('filament.root.resources.products.stock-opname'))
         ];
     }
 
