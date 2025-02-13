@@ -120,18 +120,18 @@ class StockOpnameResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('date')
-                    ->date()
-                    ->sortable(),
                 TextColumn::make('status')
                     ->badge()
                     ->formatStateUsing(fn($state) => StockOpnameStatus::tryFrom($state)?->label() ?? '-')
                     ->color(fn($state) => StockOpnameStatus::tryFrom($state)?->color() ?? 'gray'),
+                TextColumn::make('date')
+                    ->date()
+                    ->sortable(),
                 TextColumn::make('user.name')
                     ->searchable(),
-                TextColumn::make('approved_by')
-                    ->numeric()
-                    ->sortable(),
+                TextColumn::make('approval.name')
+                    ->label('Approved_by')
+                    ->searchable(),
                 TextColumn::make('approved_at')
                     ->date()
                     ->sortable(),
@@ -152,9 +152,11 @@ class StockOpnameResource extends Resource
                     ViewAction::make()
                         ->color('info'),
                     EditAction::make()
-                        ->color('warning'),
+                        ->color('warning')
+                        ->visible(fn($record) => $record->status == 0 | $record->status == 2),
                     DeleteAction::make()
                         ->color('danger')
+                        ->visible(fn($record) => $record->status == 0 | $record->status == 2),
                 ])
             ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
@@ -176,7 +178,6 @@ class StockOpnameResource extends Resource
         return [
             'index' => Pages\ListStockOpnames::route('/'),
             'create' => Pages\CreateStockOpname::route('/create'),
-            'edit' => Pages\EditStockOpname::route('/{record}/edit'),
         ];
     }
 
@@ -187,7 +188,9 @@ class StockOpnameResource extends Resource
 
             if ($status == 3) {
                 $record->update([
-                    'status' => $status
+                    'status' => $status,
+                    'approved_by' => Auth::user()->id,
+                    'approved_at' => now()
                 ]);
 
                 self::updateStock($record);
@@ -216,9 +219,10 @@ class StockOpnameResource extends Resource
             ->chunk(
                 100,
                 function ($details) {
-                    // dd($details);
                     foreach ($details as $detail) {
-                        dispatch(new UpdateStockProduct($detail));
+                        $product = Product::find($detail['product_id']);
+                        $product->stock = $detail['stock_actual'];
+                        $product->save();
                     }
                 }
             );

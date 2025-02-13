@@ -8,6 +8,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class UpdateStockProduct implements ShouldQueue
 {
@@ -29,6 +30,7 @@ class UpdateStockProduct implements ShouldQueue
     {
         $product = Product::find($this->detail['product_id']);
         $product->stock = $this->detail['stock_actual'];
+        Log::info($this->detail['stock_actual']);
         $product->save();
     }
 }
