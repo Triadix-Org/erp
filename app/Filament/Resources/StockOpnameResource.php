@@ -9,6 +9,7 @@ use App\Jobs\UpdateStockProduct;
 use App\Models\DetailStockOpname;
 use App\Models\Product;
 use App\Models\StockOpname;
+use App\Models\Warehouse;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Section;
@@ -52,6 +53,16 @@ class StockOpnameResource extends Resource
                         DatePicker::make('date')
                             ->default(now())
                             ->required(),
+                        Select::make('warehouse_id')
+                            ->label('Warehouse')
+                            ->required()
+                            ->searchable()
+                            ->reactive()
+                            ->options(Warehouse::pluck('name', 'id'))
+                        // ->afterStateUpdated(function (callable $set) {
+                        //     // Reset pilihan produk saat warehouse_id berubah
+                        //     $set('product_id', null);
+                        // }),
                     ]),
                 Section::make('Product')
                     ->columns(1)
@@ -62,7 +73,9 @@ class StockOpnameResource extends Resource
                             ->schema([
                                 Select::make('product_id')
                                     ->label('Product')
-                                    ->options(Product::isActive()->get()->pluck('name', 'id'))
+                                    ->options(
+                                        Product::isActive()->get()->pluck('name', 'id')
+                                    )
                                     ->required()
                                     ->searchable()
                                     ->reactive()
