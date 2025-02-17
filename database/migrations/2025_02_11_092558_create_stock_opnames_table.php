@@ -15,7 +15,7 @@ return new class extends Migration
         Schema::create('stock_opnames', function (Blueprint $table) {
             $table->id();
             $table->date('date');
-            $table->integer('status');
+            $table->integer('status')->default(0);
             $table->foreignIdFor(User::class);
             $table->integer('approved_by')->nullable();
             $table->date('approved_at')->nullable();
