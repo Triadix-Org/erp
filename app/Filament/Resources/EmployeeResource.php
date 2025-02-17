@@ -8,6 +8,8 @@ use App\Enum\Employee\Religion;
 use App\Filament\Resources\EmployeeResource\Pages;
 use App\Filament\Resources\EmployeeResource\RelationManagers;
 use App\Models\Employee;
+use App\Models\Department;
+use App\Models\Division;
 use App\Models\PersonnelData;
 use Filament\Forms;
 use Filament\Forms\Components\Fieldset;
@@ -119,10 +121,14 @@ class EmployeeResource extends Resource
                                             ->dehydrated(false)
                                             ->placeholder('Auto'),
                                         TextInput::make('position'),
-                                        TextInput::make('dept')
-                                            ->label('Department'),
-                                        TextInput::make('div')
-                                            ->label('Division'),
+                                        Select::make('div')
+                                            ->label('Division')
+                                            ->options(Division::all()->pluck('name', 'id'))
+                                            ->searchable(),
+                                        Select::make('dept')
+                                            ->label('Department')
+                                            ->options(Department::all()->pluck('name', 'id'))
+                                            ->searchable(),
                                         TextInput::make('position_level')
                                             ->label('Position Level'),
                                         Select::make('employment_status')
@@ -152,6 +158,18 @@ class EmployeeResource extends Resource
                                                     ->label('Employment agreement')
                                                     ->directory('employee/mou'),
                                             ])
+                                    ])
+                            ]),
+                        Tab::make('Sallary')
+                            ->schema([
+                                Grid::make()
+                                    ->relationship('personnel')
+                                    ->schema([
+                                        TextInput::make('sallary')
+                                            ->label('Sallary (Rp.)')
+                                            ->numeric()
+                                            ->required()
+                                            ->columnSpanFull()
                                     ])
                             ])
                     ])
@@ -213,8 +231,8 @@ class EmployeeResource extends Resource
             ])
             ->actions([
                 ActionGroup::make([
-                    ViewAction::make(),
-                    Tables\Actions\EditAction::make(),
+                    ViewAction::make()->color('info'),
+                    Tables\Actions\EditAction::make()->color('warning'),
                     Tables\Actions\DeleteAction::make(),
                 ]),
                 Tables\Actions\Action::make('id')
@@ -224,47 +242,6 @@ class EmployeeResource extends Resource
                     ->tooltip('Print ID Card')
                     ->url(fn($record) => env('APP_URL') . '/human-resource/id-card/' . $record->nip)
                     ->openUrlInNewTab()
-                // Action::make('openModal')
-                //     ->icon('heroicon-s-user-circle')
-                //     ->iconSize('lg')
-                //     ->modalHeading('Employment Data')
-                //     ->label(false)
-                //     ->form(function (Employee $record) {
-                //         $data = $record->personnel;
-                //         $nip = $data->nip;
-                //         $position = $data->position;
-
-                //         return [
-                //             TextInput::make('nip')
-                //                 ->default($nip)
-                //                 ->readOnly(),
-                //             TextInput::make('position')
-                //                 ->default($position),
-                //         ];
-                //     })
-                //     ->action(function (Employee $record, array $data) {
-                //         // $personnel = $record->personnel;
-                //         try {
-                //             $record->personnel->position = $data['position'];
-                //             $record->personnel->save();
-                //             Notification::make()
-                //                 ->title('Employment Data Sukses')
-                //                 ->success()
-                //                 ->send();
-                //         } catch (Throwable $th) {
-                //             Notification::make()
-                //                 ->title('Employment Data Gagal')
-                //                 ->body($th->getMessage())
-                //                 ->error()
-                //                 ->send();
-                //         }
-                //     })
-                // EditAction::make('personnel')
-                //     ->record($this->post)
-                //     ->form([
-                //         TextInput::make('nip'),
-                //         TextInput::make('position')
-                //     ])
             ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
