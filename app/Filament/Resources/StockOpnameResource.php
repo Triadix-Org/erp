@@ -58,9 +58,10 @@ class StockOpnameResource extends Resource
                             ->required()
                             ->searchable()
                             ->reactive()
-                            ->options(Warehouse::pluck('name', 'id'))
+                            ->live()
+                            ->afterStateUpdated(fn(Set $set, $state) => $set('product_id', null))
+                            ->options(fn() => Warehouse::pluck('name', 'id'))
                         // ->afterStateUpdated(function (callable $set) {
-                        //     // Reset pilihan produk saat warehouse_id berubah
                         //     $set('product_id', null);
                         // }),
                     ]),
@@ -74,7 +75,14 @@ class StockOpnameResource extends Resource
                                 Select::make('product_id')
                                     ->label('Product')
                                     ->options(
-                                        Product::isActive()->get()->pluck('name', 'id')
+                                        function (Get $get) {
+                                            // $warehouseId = $get('warehouse_id');
+                                            // if ($warehouseId) {
+                                            //     return Product::isActive()->where('warehouse_id', $warehouseId)->get()->pluck('name', 'id');
+                                            // }
+                                            // return [];
+                                            return Product::isActive()->get()->pluck('name', 'id');
+                                        }
                                     )
                                     ->required()
                                     ->searchable()
