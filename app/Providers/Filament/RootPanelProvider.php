@@ -33,6 +33,7 @@ class RootPanelProvider extends PanelProvider
             ->id('root')
             ->path('root')
             ->login()
+            ->registration()
             ->colors([
                 'primary' => Color::Teal,
             ])

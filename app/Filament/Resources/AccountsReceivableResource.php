@@ -2,21 +2,31 @@
 
 namespace App\Filament\Resources;
 
+use App\Enum\IncomeType;
 use App\Enum\PaymentStatus;
 use App\Filament\Resources\AccountsReceivableResource\Pages;
 use App\Filament\Resources\AccountsReceivableResource\RelationManagers;
 use App\Models\AccountsReceivable;
+use App\Models\Customer;
+use App\Models\Income;
+use App\Models\Invoice;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\DB;
 
 class AccountsReceivableResource extends Resource
 {
@@ -96,8 +106,54 @@ class AccountsReceivableResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                ActionGroup::make([
+                    Action::make('setPaid')
+                        ->color('info')
+                        ->label('Set to Paid')
+                        ->modalHeading('Set Status to Paid')
+                        ->icon('heroicon-s-check-circle')
+                        ->visible(fn($record) => $record->status == 0)
+                        ->form([
+                            Section::make()
+                                ->schema([
+                                    FileUpload::make('attach')
+                                        ->label('Proof of Payment')
+                                        ->directory('accounts-receivable')
+                                ])
+                        ])
+                        ->action(function (array $data, AccountsReceivable $record): void {
+                            $record->attach = $data['attach'];
+                            $record->payment_date = now();
+                            $record->status = 1;
+                            $record->save();
+
+                            $cust = Customer::find($record->customer_id);
+
+                            DB::transaction(function () use ($record, $cust) {
+                                $invoice = Invoice::find($record->invoice_id);
+                                if ($invoice) {
+                                    $invoice->payment_status = 1;
+                                    $invoice->save();
+                                }
+
+                                // Add to outcome data
+                                $outcome = new Income();
+                                $outcome->date      = now();
+                                $outcome->amount    = $record->amount;
+                                $outcome->type      = IncomeType::SALES;
+                                $outcome->from      = $cust->name;
+                                $outcome->status    = 1;
+                                $outcome->save();
+                            });
+
+                            Notification::make()
+                                ->success()
+                                ->title('Saved Successfully!')
+                                ->send();
+                        }),
+                    Tables\Actions\EditAction::make()->color('warning'),
+                    Tables\Actions\DeleteAction::make(),
+                ])
             ], position: ActionsPosition::BeforeColumns);
     }
 

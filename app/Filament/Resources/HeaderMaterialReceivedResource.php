@@ -150,7 +150,7 @@ class HeaderMaterialReceivedResource extends Resource
                 Tables\Columns\TextColumn::make('delivery_date')
                     ->date()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('supplier_id')
+                Tables\Columns\TextColumn::make('supplier.name')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('received_by')
@@ -184,7 +184,7 @@ class HeaderMaterialReceivedResource extends Resource
                 ActionGroup::make([
                     ViewAction::make()
                         ->modalWidth('6xl'),
-                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\EditAction::make()->color('warning'),
                     DeleteAction::make(),
                     Action::make('print')
                         ->label('Print PDF')

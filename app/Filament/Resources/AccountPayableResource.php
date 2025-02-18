@@ -119,13 +119,15 @@ class AccountPayableResource extends Resource
                     })
             ])
             ->actions([
-                ViewAction::make(),
+                ViewAction::make()
+                    ->color('info'),
                 Action::make('payment_info')
                     ->label('Pay')
                     ->modalHeading('Pay Accounts Payable')
                     ->icon('heroicon-s-credit-card')
                     ->color('primary')
                     ->button()
+                    ->visible(fn($record) => $record->status == 0)
                     ->form([
                         Section::make()
                             ->columns(2)
