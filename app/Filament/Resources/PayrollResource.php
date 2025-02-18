@@ -50,8 +50,8 @@ class PayrollResource extends Resource
                                     ->schema([
                                         Select::make('employee_id')
                                             ->options(Employee::all()->pluck('name', 'id')),
-                                        TextInput::make('salary')
-
+                                        Select::make('salary')
+                                            ->options(Employee::all()->pluck('sallary', 'id')),
                                     ])
                                     ->default(fn() => Employee::all()->map(fn($employee) => ['employee_id' => $employee->id])->toArray())
                             ])
