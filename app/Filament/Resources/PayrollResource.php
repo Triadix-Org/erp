@@ -2,17 +2,24 @@
 
 namespace App\Filament\Resources;
 
+use App\Enum\Month;
 use App\Filament\Resources\PayrollResource\Pages;
 use App\Filament\Resources\PayrollResource\RelationManagers;
+use App\Models\Employee;
 use App\Models\Payroll;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Icetalker\FilamentTableRepeater\Forms\Components\TableRepeater;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -27,41 +34,28 @@ class PayrollResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('personnel_data_id')
-                    ->required()
-                    ->numeric(),
-                TextInput::make('employee_id')
-                    ->required()
-                    ->numeric(),
-                TextInput::make('salary')
-                    ->required()
-                    ->numeric()
-                    ->default(0),
-                TextInput::make('overtime')
-                    ->required()
-                    ->numeric()
-                    ->default(0),
-                TextInput::make('bonus')
-                    ->required()
-                    ->numeric()
-                    ->default(0),
-                TextInput::make('cut')
-                    ->required()
-                    ->numeric()
-                    ->default(0),
-                TextInput::make('total')
-                    ->required()
-                    ->numeric()
-                    ->default(0),
-                TextInput::make('month')
-                    ->maxLength(255),
-                TextInput::make('year')
-                    ->numeric(),
-                TextInput::make('status')
-                    ->required()
-                    ->numeric()
-                    ->default(0),
-                DatePicker::make('paid_date'),
+                Section::make()
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                Select::make('month')
+                                    ->required()
+                                    ->options(Month::labels())
+                                    ->searchable(),
+                                TextInput::make('year')
+                                    ->required()
+                                    ->numeric(),
+                                TableRepeater::make('detail')
+                                    ->relationship()
+                                    ->schema([
+                                        Select::make('employee_id')
+                                            ->options(Employee::all()->pluck('name', 'id')),
+                                        TextInput::make('salary')
+
+                                    ])
+                                    ->default(fn() => Employee::all()->map(fn($employee) => ['employee_id' => $employee->id])->toArray())
+                            ])
+                    ])
             ]);
     }
 
@@ -69,50 +63,7 @@ class PayrollResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('personnel_data_id')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('employee_id')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('salary')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('overtime')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('bonus')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('cut')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('total')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('month')
-                    ->searchable(),
-                TextColumn::make('year')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('status')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('paid_date')
-                    ->date()
-                    ->sortable(),
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('deleted_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                //
             ])
             ->filters([
                 //

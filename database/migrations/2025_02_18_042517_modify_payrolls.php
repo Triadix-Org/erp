@@ -1,10 +1,9 @@
 <?php
 
-use App\Models\Employee;
-use App\Models\PersonnelData;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use App\Models\Payroll;
 
 return new class extends Migration
 {
@@ -15,17 +14,11 @@ return new class extends Migration
     {
         Schema::create('payrolls', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(PersonnelData::class);
-            $table->foreignIdFor(Employee::class);
-            $table->integer('salary')->default(0);
-            $table->integer('overtime')->default(0);
-            $table->integer('bonus')->default(0);
-            $table->integer('cut')->default(0);
-            $table->integer('total')->default(0);
             $table->string('month')->nullable();
             $table->integer('year')->nullable();
             $table->integer('status')->default(0);
             $table->date('paid_date')->nullable();
+            $table->integer('total_amount')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -36,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('payrolls');
+        //
     }
 };

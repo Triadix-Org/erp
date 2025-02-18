@@ -7,6 +7,7 @@ use App\Enum\Employee\MarriageStatus;
 use App\Enum\Employee\Religion;
 use App\Filament\Resources\EmployeeResource\Pages;
 use App\Filament\Resources\EmployeeResource\RelationManagers;
+use App\Filament\Resources\EmployeeResource\RelationManagers\PersonnelRelationManager;
 use App\Models\Employee;
 use App\Models\Department;
 use App\Models\Division;
@@ -15,6 +16,7 @@ use Filament\Forms;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
@@ -52,124 +54,134 @@ class EmployeeResource extends Resource
                         Tab::make('profile')
                             ->label('Personal Info')
                             ->schema([
-                                Grid::make([
-                                    'default' => 1,
-                                    'sm' => 1,
-                                    'md' => 2,
-                                    'lg' => 2,
-                                    'xl' => 2,
-                                    '2xl' => 2,
-                                ])
+                                Section::make()
                                     ->schema([
-                                        Forms\Components\TextInput::make('nip')
-                                            ->readOnly()
-                                            ->dehydrated(false)
-                                            ->placeholder('Auto'),
-                                        Forms\Components\TextInput::make('name')
-                                            ->required()
-                                            ->maxLength(255),
-                                        Forms\Components\TextInput::make('nik')
-                                            ->required()
-                                            ->maxLength(255),
-                                        Forms\Components\TextInput::make('place_of_birth')
-                                            ->required()
-                                            ->maxLength(255),
-                                        Forms\Components\DatePicker::make('date_of_birth')
-                                            ->required(),
-                                        Select::make('gender')
-                                            ->options(Gender::labels())
-                                            ->required(),
-                                        Select::make('religion')
-                                            ->options(Religion::labels())
-                                            ->required(),
-                                        Select::make('marriage_status')
-                                            ->options(MarriageStatus::labels())
-                                            ->required(),
-                                        Forms\Components\TextInput::make('address')
-                                            ->required()
-                                            ->maxLength(255),
-                                        Forms\Components\TextInput::make('phone')
-                                            ->tel()
-                                            ->maxLength(255),
-                                        Forms\Components\TextInput::make('email')
-                                            ->email()
-                                            ->maxLength(255),
-                                        Forms\Components\TextInput::make('emergency_phone')
-                                            ->tel()
-                                            ->maxLength(255),
-                                        Forms\Components\DatePicker::make('start_working')
-                                            ->required(),
-                                        FileUpload::make('photo')
-                                            ->directory('employee/photo')
+                                        Grid::make([
+                                            'default' => 1,
+                                            'sm' => 1,
+                                            'md' => 2,
+                                            'lg' => 2,
+                                            'xl' => 2,
+                                            '2xl' => 2,
+                                        ])
+                                            ->schema([
+                                                Forms\Components\TextInput::make('nip')
+                                                    ->readOnly()
+                                                    ->dehydrated(false)
+                                                    ->placeholder('Auto'),
+                                                Forms\Components\TextInput::make('name')
+                                                    ->required()
+                                                    ->maxLength(255),
+                                                Forms\Components\TextInput::make('nik')
+                                                    ->required()
+                                                    ->maxLength(255),
+                                                Forms\Components\TextInput::make('place_of_birth')
+                                                    ->required()
+                                                    ->maxLength(255),
+                                                Forms\Components\DatePicker::make('date_of_birth')
+                                                    ->required(),
+                                                Select::make('gender')
+                                                    ->options(Gender::labels())
+                                                    ->required(),
+                                                Select::make('religion')
+                                                    ->options(Religion::labels())
+                                                    ->required(),
+                                                Select::make('marriage_status')
+                                                    ->options(MarriageStatus::labels())
+                                                    ->required(),
+                                                Forms\Components\TextInput::make('address')
+                                                    ->required()
+                                                    ->maxLength(255),
+                                                Forms\Components\TextInput::make('phone')
+                                                    ->tel()
+                                                    ->maxLength(255),
+                                                Forms\Components\TextInput::make('email')
+                                                    ->email()
+                                                    ->maxLength(255),
+                                                Forms\Components\TextInput::make('emergency_phone')
+                                                    ->tel()
+                                                    ->maxLength(255),
+                                                Forms\Components\DatePicker::make('start_working')
+                                                    ->required(),
+                                                FileUpload::make('photo')
+                                                    ->directory('employee/photo')
+                                            ])
                                     ])
                             ]),
-                        Tab::make('personnal')
+                        Tab::make('personnel')
                             ->label('Employment Info')
                             ->schema([
-                                Grid::make([
-                                    'default' => 1,
-                                    'sm' => 1,
-                                    'md' => 2,
-                                    'lg' => 2,
-                                    'xl' => 2,
-                                    '2xl' => 2,
-                                ])
-                                    ->relationship('personnel')
+                                Section::make()
                                     ->schema([
-                                        TextInput::make('nip')
-                                            ->readOnly()
-                                            ->dehydrated(false)
-                                            ->placeholder('Auto'),
-                                        TextInput::make('position'),
-                                        Select::make('div')
-                                            ->label('Division')
-                                            ->options(Division::all()->pluck('name', 'id'))
-                                            ->searchable(),
-                                        Select::make('dept')
-                                            ->label('Department')
-                                            ->options(Department::all()->pluck('name', 'id'))
-                                            ->searchable(),
-                                        TextInput::make('position_level')
-                                            ->label('Position Level'),
-                                        Select::make('employment_status')
-                                            ->options([
-                                                0 => 'Internship',
-                                                1 => 'PKWT',
-                                                2 => 'PKWTT',
-                                            ]),
-                                        Fieldset::make('Bank Account')
+                                        Grid::make([
+                                            'default' => 1,
+                                            'sm' => 1,
+                                            'md' => 2,
+                                            'lg' => 2,
+                                            'xl' => 2,
+                                            '2xl' => 2,
+                                        ])
+                                            ->relationship('personnel')
                                             ->schema([
-                                                TextInput::make('bank'),
-                                                TextInput::make('bank_number'),
-                                                TextInput::make('bank_account_name'),
-                                            ]),
-                                        Fieldset::make('Documents')
-                                            ->schema([
-                                                FileUpload::make('npwp')
-                                                    ->directory('employee/npwp'),
-                                                FileUpload::make('contract_file')
-                                                    ->directory('employee/contract_file'),
-                                                FileUpload::make('ktp')
-                                                    ->directory('employee/ktp'),
-                                                FileUpload::make('cv')
-                                                    ->directory('employee/cv')
-                                                    ->openable(),
-                                                FileUpload::make('mou')
-                                                    ->label('Employment agreement')
-                                                    ->directory('employee/mou'),
+                                                TextInput::make('nip')
+                                                    ->readOnly()
+                                                    ->dehydrated(false)
+                                                    ->placeholder('Auto'),
+                                                TextInput::make('position'),
+                                                Select::make('div')
+                                                    ->label('Division')
+                                                    ->options(Division::all()->pluck('name', 'id'))
+                                                    ->searchable(),
+                                                Select::make('dept')
+                                                    ->label('Department')
+                                                    ->options(Department::all()->pluck('name', 'id'))
+                                                    ->searchable(),
+                                                TextInput::make('position_level')
+                                                    ->label('Position Level'),
+                                                Select::make('employment_status')
+                                                    ->options([
+                                                        0 => 'Internship',
+                                                        1 => 'PKWT',
+                                                        2 => 'PKWTT',
+                                                    ]),
+                                                Fieldset::make('Bank Account')
+                                                    ->schema([
+                                                        TextInput::make('bank'),
+                                                        TextInput::make('bank_number'),
+                                                        TextInput::make('bank_account_name'),
+                                                    ]),
+                                                // Fieldset::make('Documents')
+                                                //     ->schema([
+                                                // FileUpload::make('npwp')
+                                                //     ->directory('employee/npwp')
+                                                //     ->multiple(false),
+                                                // FileUpload::make('personnel.contract_file')
+                                                //     ->directory('employee/contract_file'),
+                                                // FileUpload::make('personnel.ktp')
+                                                //     ->directory('employee/ktp'),
+                                                // FileUpload::make('personnel.cv')
+                                                //     ->directory('employee/cv')
+                                                //     ->openable(),
+                                                // FileUpload::make('personnel.mou')
+                                                //     ->label('Employment agreement')
+                                                //     ->directory('employee/mou'),
+                                                // ])
                                             ])
                                     ])
                             ]),
                         Tab::make('Sallary')
                             ->schema([
-                                Grid::make()
-                                    ->relationship('personnel')
+                                Section::make()
                                     ->schema([
-                                        TextInput::make('sallary')
-                                            ->label('Sallary (Rp.)')
-                                            ->numeric()
-                                            ->required()
-                                            ->columnSpanFull()
+                                        Grid::make()
+                                            ->relationship('personnel')
+                                            ->schema([
+                                                TextInput::make('sallary')
+                                                    ->label('Sallary (Rp.)')
+                                                    ->numeric()
+                                                    ->required()
+                                                    ->columnSpanFull()
+                                            ])
                                     ])
                             ])
                     ])
@@ -253,7 +265,9 @@ class EmployeeResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ManageEmployees::route('/'),
+            'index' => Pages\ListEmployees::route('/'),
+            'create' => Pages\CreateEmployee::route('/create'),
+            'edit' => Pages\EditEmployee::route('/{record}/edit'),
         ];
     }
 }
