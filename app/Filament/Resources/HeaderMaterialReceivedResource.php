@@ -101,9 +101,9 @@ class HeaderMaterialReceivedResource extends Resource
                                     ->numeric()
                                     ->prefix('Rp.')
                                     ->default(0),
-                                Forms\Components\TextArea::make('received_condition')
+                                Forms\Components\Textarea::make('received_condition')
                                     ->maxLength(255),
-                                Forms\Components\TextArea::make('comment')
+                                Forms\Components\Textarea::make('comment')
                                     ->maxLength(255),
                             ]),
                         Fieldset::make('Item/Goods')
