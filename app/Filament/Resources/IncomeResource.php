@@ -2,16 +2,14 @@
 
 namespace App\Filament\Resources;
 
-use App\Enum\OutcomeType;
-use App\Filament\Resources\OutcomeResource\Pages;
-use App\Filament\Resources\OutcomeResource\RelationManagers;
-use App\Filament\Resources\ProductResource\Widgets\Product as ProductWidget;
-use App\Filament\Resources\OutcomeResource\Widgets\Outcome as WidgetsOutcome;
-use App\Models\Outcome;
+use App\Enum\IncomeType;
+use App\Filament\Resources\IncomeResource\Pages;
+use App\Filament\Resources\IncomeResource\RelationManagers;
+use App\Filament\Resources\IncomeResource\Widgets\IncomeWidget;
+use App\Models\Income;
 use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -19,43 +17,41 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class OutcomeResource extends Resource
+class IncomeResource extends Resource
 {
-    protected static ?string $model = Outcome::class;
+    protected static ?string $model = Income::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-document-chart-bar';
     protected static ?string $navigationGroup = 'Finance';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Grid::make(2)
+                Section::make()
+                    ->columns(2)
                     ->schema([
-                        Section::make()
-                            ->columnSpan(1)
-                            ->schema([
-                                DatePicker::make('date')
-                                    ->default(now())
-                                    ->required(),
-                                TextInput::make('amount')
-                                    ->required()
-                                    ->numeric()
-                                    ->default(0),
-                                Select::make('type')
-                                    ->options(OutcomeType::labels())
-                                    ->required(),
-                                TextInput::make('pay_to')
-                                    ->maxLength(255),
-                            ])
+                        DatePicker::make('date')
+                            ->required()
+                            ->default(now()),
+                        TextInput::make('amount')
+                            ->required()
+                            ->numeric(),
+                        Select::make('type')
+                            ->required()
+                            ->options(IncomeType::labels()),
+                        TextInput::make('from')
+                            ->required()
+                            ->label('Income From')
                     ])
             ]);
     }
@@ -64,30 +60,19 @@ class OutcomeResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('date')
-                    ->date('d-m-Y')
+                TextColumn::make('date')
+                    ->date()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('amount')
+                TextColumn::make('amount')
                     ->numeric()
+                    ->label('Amount (Rp.)')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('type')
+                TextColumn::make('type')
                     ->badge()
-                    ->formatStateUsing(fn($state) => OutcomeType::tryFrom($state)?->label() ?? '-')
+                    ->formatStateUsing(fn($state) => IncomeType::tryFrom($state)?->label() ?? '-')
                     ->color('info'),
-                Tables\Columns\TextColumn::make('pay_to')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('deleted_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('from')
+                    ->searchable()
             ])
             ->filters([
                 Filter::make('bulan_ini')
@@ -116,13 +101,15 @@ class OutcomeResource extends Resource
                                 $data['date_until'],
                                 fn(Builder $query, $date): Builder => $query->whereDate('date', '<=', $date),
                             );
-                    })
+                    }),
+                SelectFilter::make('type')
+                    ->options(IncomeType::labels())
             ])
             ->actions([
                 ActionGroup::make([
                     ViewAction::make()->color('info'),
-                    Tables\Actions\EditAction::make(),
-                    DeleteAction::make()
+                    Tables\Actions\EditAction::make()->color('warning'),
+                    Tables\Actions\DeleteAction::make(),
                 ])
             ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
@@ -132,19 +119,17 @@ class OutcomeResource extends Resource
             ]);
     }
 
-    public static function getWidgets(): array
-    {
-        return [
-            ProductWidget::class
-        ];
-    }
-
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListOutcomes::route('/'),
-            'create' => Pages\CreateOutcome::route('/create'),
-            'edit' => Pages\EditOutcome::route('/{record}/edit'),
+            'index' => Pages\ManageIncomes::route('/'),
+        ];
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            IncomeWidget::class
         ];
     }
 }
