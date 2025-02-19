@@ -15,9 +15,13 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Icetalker\FilamentTableRepeater\Forms\Components\TableRepeater;
 use Illuminate\Database\Eloquent\Builder;
@@ -46,27 +50,92 @@ class PayrollResource extends Resource
                                     ->required()
                                     ->numeric(),
                                 TableRepeater::make('detail')
-                                    ->relationship()
+                                    ->orderable(false)
+                                    ->addable(false)
                                     ->schema([
-                                        Select::make('employee_id')
-                                            ->options(Employee::all()->pluck('name', 'id')),
-                                        Select::make('salary')
-                                            ->options(Employee::all()->pluck('sallary', 'id')),
+                                        TextInput::make('employee_id')
+                                            ->label('ID')
+                                            ->readOnly(),
+                                        TextInput::make('name')
+                                            ->readOnly()
+                                            ->dehydrated(false),
+                                        TextInput::make('salary')
+                                            ->readOnly()
+                                            ->numeric()
+                                            ->prefix('Rp.'),
+                                        TextInput::make('overtime')
+                                            ->default(0)
+                                            ->numeric()
+                                            ->prefix('Rp.')
+                                            ->reactive()
+                                            ->debounce(500)
+                                            ->afterStateUpdated(function (Get $get, Set $set) {
+                                                self::calculateAmount($get, $set);
+                                            }),
+                                        TextInput::make('bonus')
+                                            ->default(0)
+                                            ->numeric()
+                                            ->prefix('Rp.')
+                                            ->reactive()
+                                            ->debounce(500)
+                                            ->afterStateUpdated(function (Get $get, Set $set) {
+                                                self::calculateAmount($get, $set);
+                                            }),
+                                        TextInput::make('cut')
+                                            ->label('Deduction')
+                                            ->default(0)
+                                            ->numeric()
+                                            ->prefix('Rp.')
+                                            ->reactive()
+                                            ->debounce(500)
+                                            ->afterStateUpdated(function (Get $get, Set $set) {
+                                                self::calculateAmount($get, $set);
+                                            }),
+                                        TextInput::make('total')
+                                            ->default(0)
+                                            ->numeric()
+                                            ->prefix('Rp.')
                                     ])
-                                    ->default(fn() => Employee::all()->map(fn($employee) => ['employee_id' => $employee->id])->toArray())
+                                    ->colStyles(function () {
+                                        return [
+                                            'employee_id' => 'width: 5%;',
+                                        ];
+                                    })
                             ])
                     ])
             ]);
+    }
+
+    public static function calculateAmount($get, $set)
+    {
+        $salary = $get('salary');
+        $overtime = $get('overtime') ?? 0;
+        $bonus = $get('bonus') ?? 0;
+        $cut = $get('cut') ?? 0;
+
+        $total = $salary + $overtime + $bonus - $cut;
+        $set('total', $total);
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                //
+                TextColumn::make('month')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('year')
+                    ->searchable()
+                    ->sortable()
             ])
             ->filters([
-                //
+                SelectFilter::make('month')
+                    ->options(Month::labels()),
+                Filter::make('year')
+                    ->form([
+                        TextInput::make('years')
+                            ->type('month')
+                    ])
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
