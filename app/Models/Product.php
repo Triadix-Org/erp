@@ -30,4 +30,14 @@ class Product extends Model
     {
         return $this->belongsTo(ProductCategory::class, 'category_code', 'code');
     }
+
+    public function warehouse(): BelongsTo
+    {
+        return $this->belongsTo(Warehouse::class);
+    }
+
+    public function scopeIsActive($query)
+    {
+        return $query->where('status', 1);
+    }
 }

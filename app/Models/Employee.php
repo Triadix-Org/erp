@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Employee extends Model
@@ -14,9 +15,9 @@ class Employee extends Model
     public $timestamps = true;
     protected $guarded = [];
 
-    public function personnel(): BelongsTo
+    public function personnel(): HasOne
     {
-        return $this->belongsTo(PersonnelData::class, 'nip', 'nip');
+        return $this->hasOne(PersonnelData::class, 'nip', 'nip');
     }
 
     public static function boot()
@@ -34,7 +35,7 @@ class Employee extends Model
 
             if ($lastest) {
                 // Ambil nomor urut terakhir setelah kode dan tahun
-                $lastNumber = (int) substr($lastest->code, strlen($code));
+                $lastNumber = (int) substr($lastest->nip, strlen($code));
                 // Tambah 1
                 $newNumber = $lastNumber + 1;
             } else {

@@ -21,6 +21,7 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\Support\Enums\MaxWidth;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use DiogoGPinto\AuthUIEnhancer\AuthUIEnhancerPlugin;
+use FilipFonal\FilamentLogManager\FilamentLogManager;
 use TomatoPHP\FilamentUsers\FilamentUsersPlugin;
 
 class RootPanelProvider extends PanelProvider
@@ -32,6 +33,7 @@ class RootPanelProvider extends PanelProvider
             ->id('root')
             ->path('root')
             ->login()
+            ->registration()
             ->colors([
                 'primary' => Color::Teal,
             ])
@@ -60,9 +62,11 @@ class RootPanelProvider extends PanelProvider
             ->plugins([
                 FilamentShieldPlugin::make(),
                 FilamentUsersPlugin::make(),
+                FilamentLogManager::make()
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            ->databaseNotifications();
     }
 }

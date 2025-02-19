@@ -101,9 +101,9 @@ class HeaderMaterialReceivedResource extends Resource
                                     ->numeric()
                                     ->prefix('Rp.')
                                     ->default(0),
-                                Forms\Components\TextArea::make('received_condition')
+                                Forms\Components\Textarea::make('received_condition')
                                     ->maxLength(255),
-                                Forms\Components\TextArea::make('comment')
+                                Forms\Components\Textarea::make('comment')
                                     ->maxLength(255),
                             ]),
                         Fieldset::make('Item/Goods')
@@ -150,7 +150,7 @@ class HeaderMaterialReceivedResource extends Resource
                 Tables\Columns\TextColumn::make('delivery_date')
                     ->date()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('supplier_id')
+                Tables\Columns\TextColumn::make('supplier.name')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('received_by')
@@ -184,7 +184,7 @@ class HeaderMaterialReceivedResource extends Resource
                 ActionGroup::make([
                     ViewAction::make()
                         ->modalWidth('6xl'),
-                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\EditAction::make()->color('warning'),
                     DeleteAction::make(),
                     Action::make('print')
                         ->label('Print PDF')

@@ -38,6 +38,16 @@ class Invoice extends Model
             $model->inv_no          = $itemNumber;
             $model->user_id         = Auth::user()->id;
         });
+
+        static::created(function ($model) {
+            $accountRcv                 = new AccountsReceivable();
+            $accountRcv->invoice_id     = $model->getKey();
+            $accountRcv->customer_id    = $model->customer_id;
+            $accountRcv->date           = now();
+            $accountRcv->due_date       = $model->payment_due;
+            $accountRcv->amount         = $model->total_amount;
+            $accountRcv->save();
+        });
     }
 
     public function customer(): BelongsTo
