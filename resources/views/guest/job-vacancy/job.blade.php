@@ -60,9 +60,9 @@
                         </ul>
                     </div>
 
-                    <button
+                    <a href="{{ url('job') . '/' . $job->slug . '/apply' }}"
                         class="text-white w-full bg-blue-700 hover:bg-blue-800 focus:outline-none mt-4 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-lg px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Apply
-                        <i class="fa-solid fa-paper-plane"></i></button>
+                        <i class="fa-solid fa-paper-plane"></i></a>
                 </div>
             </div>
         </div>
