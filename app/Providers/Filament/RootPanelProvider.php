@@ -33,7 +33,6 @@ class RootPanelProvider extends PanelProvider
             ->id('root')
             ->path('root')
             ->login()
-            ->registration()
             ->colors([
                 'primary' => Color::Teal,
             ])
@@ -67,6 +66,9 @@ class RootPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
-            ->databaseNotifications();
+            ->databaseNotifications()
+            ->brandLogo(asset('images/primary-logo.png'))
+            ->darkModeBrandLogo(asset('images/primary-logo-white.png'))
+            ->brandLogoHeight('3rem');;
     }
 }

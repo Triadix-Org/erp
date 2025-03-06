@@ -64,4 +64,9 @@ class Invoice extends Model
     {
         return $this->hasMany(DetailInvoice::class);
     }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 }

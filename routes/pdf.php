@@ -13,3 +13,7 @@ Route::get('/sales/sales-order/pdf/{orderNum}', [Pdf\SalesOrder::class, 'generat
 Route::get('/purchasing/purchase-order/pdf/{orderNum}', [Pdf\PurchaseOrder::class, 'generate'])->name('purchase.purchase-order.pdf');
 Route::get('/purchasing/material-received-note/pdf/{num}', [Pdf\MaterialReceivedNote::class, 'generate'])->name('purchase.material-received-note.pdf');
 Route::get('/human-resource/id-card/{nip}', IDCard::class)->name('human-resource.id-card');
+
+// Invoice
+Route::get('/sales/proforma-invoice/pdf/{num}', [Pdf\Invoice::class, 'proforma'])->name('sales.proforma-invoice.pdf');
+Route::get('/sales/commercial-invoice/pdf/{num}', [Pdf\Invoice::class, 'commercial'])->name('sales.commercial-invoice.pdf');
