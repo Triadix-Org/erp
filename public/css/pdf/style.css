@@ -1,226 +1,318 @@
 @font-face {
-  font-family: SourceSansPro;
-  src: url(SourceSansPro-Regular.ttf);
+    font-family: SourceSansPro;
+    src: url(SourceSansPro-Regular.ttf);
 }
 
 .clearfix:after {
-  content: "";
-  display: table;
-  clear: both;
+    content: "";
+    display: table;
+    clear: both;
 }
 
 a {
-  color: #2d2d2d;
-  text-decoration: none;
+    color: #2d2d2d;
+    text-decoration: none;
 }
 
 body {
-  position: relative;
-  width: 18cm;  
-  height: 27cm; 
-  margin: 0 auto; 
-  color: #555555;
-  background: #FFFFFF; 
-  font-family: Arial, sans-serif; 
-  font-size: 14px; 
-  font-family: SourceSansPro;
+    position: relative;
+    width: 18cm;
+    height: 27cm;
+    margin: 0 auto;
+    color: #555555;
+    background: #ffffff;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    font-family: SourceSansPro;
 }
 
 header {
-  padding: 10px 0;
-  margin-bottom: 20px;
-  border-bottom: 1px solid #AAAAAA;
+    padding: 10px 0;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #aaaaaa;
 }
 
 #logo {
-  float: left;
-  margin-top: 8px;
+    float: left;
+    margin-top: 8px;
 }
 
 #logo img {
-  height: 70px;
+    height: 70px;
 }
 
 #company {
-  float: right;
-  text-align: right;
+    float: right;
+    text-align: right;
 }
 
-
 #details {
-  margin-bottom: 50px;
+    margin-bottom: 50px;
 }
 
 #client {
-  padding-left: 6px;
-  border-left: 6px solid #2d2d2d;
-  float: left;
+    padding-left: 6px;
+    border-left: 6px solid #2d2d2d;
+    float: left;
 }
 
 #client .to {
-  color: #777777;
+    color: #777777;
 }
 
 h2.name {
-  font-size: 1.4em;
-  font-weight: normal;
-  margin: 0;
+    font-size: 1.4em;
+    font-weight: normal;
+    margin: 0;
 }
 
 #invoice {
-  float: right;
-  text-align: right;
+    float: right;
+    text-align: right;
 }
 
 #invoice h1 {
-  color: #2d2d2d;
-  font-size: 2.4em;
-  line-height: 1em;
-  font-weight: normal;
-  margin: 0  0 10px 0;
+    color: #2d2d2d;
+    font-size: 2.4em;
+    line-height: 1em;
+    font-weight: normal;
+    margin: 0 0 10px 0;
 }
 
 #invoice .date {
-  font-size: 1.1em;
-  color: #777777;
+    font-size: 1.1em;
+    color: #777777;
 }
 
 .detail-table {
-  width: 100%;
-  border-collapse: collapse;
-  border-spacing: 0;
-  margin-bottom: 20px;
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin-bottom: 20px;
 }
 
 .detail-table th,
 .detail-table td {
-  padding: 8px 10px;
-  background: #EEEEEE;
-  border-bottom: 1px solid #FFFFFF;
+    padding: 8px 10px;
+    background: #eeeeee;
+    border-bottom: 1px solid #ffffff;
 }
 
 .detail-table th {
-  white-space: nowrap;        
-  font-weight: bold;
-  text-align: center;
-  background-color: #dfdfdf !important;
+    white-space: nowrap;
+    font-weight: bold;
+    text-align: center;
+    background-color: #dfdfdf !important;
 }
 
 .detail-table td {
-  text-align: center;
+    text-align: center;
 }
 
-.detail-table td h3{
-  color: #57B223;
-  font-size: 1.2em;
-  font-weight: normal;
-  margin: 0 0 0.2em 0;
+.detail-table td h3 {
+    color: #57b223;
+    font-size: 1.2em;
+    font-weight: normal;
+    margin: 0 0 0.2em 0;
 }
 
 .detail-table .no {
-  color: #FFFFFF;
-  font-size: 1.6em;
-  background: #2d2d2d;
+    color: #ffffff;
+    font-size: 1.6em;
+    background: #2d2d2d;
 }
 
-.detail-table td{
-  text-align: left;
+.detail-table td {
+    text-align: left;
 }
 
 .detail-table .unit {
-  background: #DDDDDD;
+    background: #dddddd;
 }
 
 .detail-table .qty {
 }
 
 .detail-table .total {
-  background: #57B223;
-  color: #FFFFFF;
+    background: #57b223;
+    color: #ffffff;
 }
 
 .detail-table td.unit,
 .detail-table td.qty,
 .detail-table td.total {
-  font-size: 1.2em;
+    font-size: 1.2em;
 }
 
 .detail-table tbody tr:last-child td {
-  border: none;
+    border: none;
 }
 
 .detail-table tfoot td {
-  padding: 10px 20px;
-  background: #FFFFFF;
-  border-bottom: none;
-  font-size: 1.2em;
-  white-space: nowrap; 
-  border-top: 1px solid #AAAAAA; 
+    padding: 10px 20px;
+    background: #ffffff;
+    border-bottom: none;
+    font-size: 1.2em;
+    white-space: nowrap;
+    border-top: 1px solid #aaaaaa;
 }
 
 .detail-table tfoot tr:first-child td {
-  border-top: none; 
+    border-top: none;
 }
 
 .detail-table tfoot tr:last-child td {
-  color: #57B223;
-  font-size: 1.4em;
-  border-top: 1px solid #57B223; 
-
+    color: #57b223;
+    font-size: 1.4em;
+    border-top: 1px solid #57b223;
 }
 
 .detail-table tfoot tr td:first-child {
-  border: none;
+    border: none;
 }
 
-#thanks{
-  font-size: 2em;
-  margin-bottom: 50px;
+#thanks {
+    font-size: 2em;
+    margin-bottom: 50px;
 }
 
-#notices{
-  margin-top: 30px;
-  padding-left: 6px;
-  border-left: 6px solid #2d2d2d;  
+#notices {
+    margin-top: 30px;
+    padding-left: 6px;
+    border-left: 6px solid #2d2d2d;
 }
 
 #notices .notice {
-  font-size: 1.2em;
+    font-size: 1.2em;
 }
 
 footer {
-  color: #777777;
-  width: 100%;
-  height: 30px;
-  position: absolute;
-  bottom: 0;
-  border-top: 1px solid #AAAAAA;
-  padding: 8px 0;
-  text-align: center;
+    color: #777777;
+    width: 100%;
+    height: 30px;
+    position: absolute;
+    bottom: 0;
+    border-top: 1px solid #aaaaaa;
+    padding: 8px 0;
+    text-align: center;
 }
 
-.sign{
+.sign {
     margin-top: 50px;
 }
 
-.signature-table{
+.signature-table {
     width: 100%;
 }
 
 .signature-table th,
-.signature-table td{
+.signature-table td {
     padding: 5px 10px;
     text-align: center;
 }
 
-.user-sign{
-  width: 125px;
+.user-sign {
+    width: 125px;
 }
 
-#sales-order-table{
-  font-size: 10px;
+#sales-order-table {
+    font-size: 10px;
 }
 
-.note-table{
-  width: 100%;
+.note-table {
+    width: 100%;
+}
+
+.right-column {
+    text-align: right !important;
+}
+
+.total-table {
+    width: 50%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin-bottom: 20px;
+    margin-left: auto;
+    margin-right: 0;
+}
+
+.total-table th,
+.total-table td {
+    font-weight: bold;
+    padding: 8px 10px;
+    background: #eeeeee;
+    border-bottom: 1px solid #ffffff;
+}
+
+.total-table th {
+    white-space: nowrap;
+    font-weight: bold;
+    text-align: center;
+    background-color: #dfdfdf !important;
+}
+
+.total-table td {
+    text-align: center;
+}
+
+.total-table td h3 {
+    color: #57b223;
+    font-size: 1.2em;
+    font-weight: normal;
+    margin: 0 0 0.2em 0;
+}
+
+.total-table .no {
+    color: #ffffff;
+    font-size: 1.6em;
+    background: #2d2d2d;
+}
+
+.total-table td {
+    text-align: left;
+}
+
+.total-table .unit {
+    background: #dddddd;
+}
+
+.total-table .qty {
+}
+
+.total-table .total {
+    background: #57b223;
+    color: #ffffff;
+}
+
+.total-table td.unit,
+.total-table td.qty,
+.total-table td.total {
+    font-size: 1.2em;
+}
+
+.total-table tbody tr:last-child td {
+    border: none;
+}
+
+.total-table tfoot td {
+    padding: 10px 20px;
+    background: #ffffff;
+    border-bottom: none;
+    font-size: 1.2em;
+    white-space: nowrap;
+    border-top: 1px solid #aaaaaa;
+}
+
+.total-table tfoot tr:first-child td {
+    border-top: none;
+}
+
+.total-table tfoot tr:last-child td {
+    color: #57b223;
+    font-size: 1.4em;
+    border-top: 1px solid #57b223;
+}
+
+.total-table tfoot tr td:first-child {
+    border: none;
 }

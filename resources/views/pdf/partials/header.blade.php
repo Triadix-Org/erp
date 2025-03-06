@@ -1,6 +1,6 @@
 <header class="clearfix">
     <div id="logo">
-        <img src="{{ public_path('storage/logo/marks03.png') }}">
+        <img src="{{ public_path('storage/logo/Logo.jpg') }}">
     </div>
     {{-- @dd($company) --}}
     <div id="company">

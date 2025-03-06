@@ -217,12 +217,14 @@ class InvoiceResource extends Resource
                     ->label('Documents')
                     ->icon('heroicon-s-document')
                     ->modalContent(function ($record) {
-                        $code = $record->code;
+                        $code = $record->inv_no;
                         return view('filament.pages.modal', compact('code'));
                     })
                     ->button()
                     ->modalCancelActionLabel('Close')
-                    ->modalHeading('Documents')
+                    ->modalHeading(function ($record) {
+                        return 'Documents - ' . $record->inv_no;
+                    })
                     ->modalSubmitAction(false)
 
 

@@ -18,8 +18,10 @@ class Product extends BaseWidget
         return [
             Stat::make('Total Active Product', $totalProduct)
                 ->icon('heroicon-m-chart-bar'),
-            Stat::make('Stock Warning (under 100 Pcs)', $minimStock),
-            Stat::make('Stock Danger (under 10 Pcs)', $dangerStock),
+            Stat::make('Stock Warning (under 100 Pcs)', $minimStock)
+                ->icon('heroicon-m-exclamation-triangle'),
+            Stat::make('Stock Danger (under 10 Pcs)', $dangerStock)
+                ->icon('heroicon-m-exclamation-circle'),
         ];
     }
 }

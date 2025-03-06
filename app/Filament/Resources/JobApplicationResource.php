@@ -2,16 +2,25 @@
 
 namespace App\Filament\Resources;
 
+use App\Enum\Employee\ApplyStatus;
 use App\Filament\Resources\JobApplicationResource\Pages;
 use App\Filament\Resources\JobApplicationResource\RelationManagers;
 use App\Models\JobApplication;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Enums\ActionsPosition;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class JobApplicationResource extends Resource
 {
@@ -80,6 +89,10 @@ class JobApplicationResource extends Resource
                 Tables\Columns\TextColumn::make('years_of_experience')
                     ->numeric()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('status')
+                    ->badge()
+                    ->formatStateUsing(fn($state) => ApplyStatus::tryFrom($state)?->label() ?? '-')
+                    ->color(fn($state) => ApplyStatus::tryFrom($state)?->color() ?? 'gray'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -94,11 +107,27 @@ class JobApplicationResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                SelectFilter::make('status')
+                    ->options(ApplyStatus::labels())
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-            ])
+                ActionGroup::make(
+                    array_merge(
+                        [
+                            ViewAction::make()->color('info'),
+                        ],
+                        array_map(
+                            fn($status) =>
+                            Action::make('setStatus' . $status->value)
+                                ->label('Set status to ' . $status->label())
+                                ->icon('heroicon-s-check-circle')
+                                ->color($status->color())
+                                ->action(fn($record) => self::setStatus($record->getKey(), $status->value)),
+                            ApplyStatus::cases()
+                        )
+                    )
+                )
+            ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
@@ -118,7 +147,32 @@ class JobApplicationResource extends Resource
         return [
             'index' => Pages\ListJobApplications::route('/'),
             'create' => Pages\CreateJobApplication::route('/create'),
-            'edit' => Pages\EditJobApplication::route('/{record}/edit'),
         ];
+    }
+
+    public static function setStatus($id, $status)
+    {
+        try {
+            DB::beginTransaction();
+
+            $record = JobApplication::find($id);
+            if ($record) {
+                $record->status = $status;
+                $record->save();
+            }
+
+            DB::commit();
+            Notification::make()
+                ->title('Saved successfully')
+                ->success()
+                ->send();
+        } catch (Throwable $th) {
+            DB::rollBack();
+            Notification::make()
+                ->title('Opps.. Something went wrong!')
+                ->body($th->getMessage())
+                ->danger()
+                ->send();
+        }
     }
 }
