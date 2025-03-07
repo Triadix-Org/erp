@@ -8,12 +8,13 @@ use App\Http\Services\Pdf;
 // use App\Http\Services\Pdf\SalesOrder;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/sales/material-request/pdf/{orderNum}', [Pdf\MaterialRequest::class, 'generate'])->name('sales.material-request.pdf');
-Route::get('/sales/sales-order/pdf/{orderNum}', [Pdf\SalesOrder::class, 'generate'])->name('sales.sales-order.pdf');
 Route::get('/purchasing/purchase-order/pdf/{orderNum}', [Pdf\PurchaseOrder::class, 'generate'])->name('purchase.purchase-order.pdf');
 Route::get('/purchasing/material-received-note/pdf/{num}', [Pdf\MaterialReceivedNote::class, 'generate'])->name('purchase.material-received-note.pdf');
 Route::get('/human-resource/id-card/{nip}', IDCard::class)->name('human-resource.id-card');
 
-// Invoice
+// Sales & Marketing
+Route::get('/sales/material-request/pdf/{orderNum}', [Pdf\MaterialRequest::class, 'generate'])->name('sales.material-request.pdf');
+Route::get('/sales/sales-order/pdf/{orderNum}', [Pdf\SalesOrder::class, 'generate'])->name('sales.sales-order.pdf');
 Route::get('/sales/proforma-invoice/pdf/{num}', [Pdf\Invoice::class, 'proforma'])->name('sales.proforma-invoice.pdf');
 Route::get('/sales/commercial-invoice/pdf/{num}', [Pdf\Invoice::class, 'commercial'])->name('sales.commercial-invoice.pdf');
+Route::get('/sales/quotation/pdf/{num}', Pdf\SalesMarketing\Quotation::class)->name('sales.quotation.pdf');
