@@ -18,6 +18,7 @@ use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Enums\ActionsPosition;
@@ -193,9 +194,15 @@ class QuotationResource extends Resource
             ])
             ->actions([
                 ActionGroup::make([
+                    Action::make('print')
+                        ->label('Print PDF')
+                        ->color('info')
+                        ->icon('heroicon-o-printer')
+                        ->url(fn($record) => env('APP_URL') . '/sales/quotation/pdf/' . $record->code)
+                        ->openUrlInNewTab(),
                     Tables\Actions\EditAction::make()
-                        ->color('info'),
-                    DeleteAction::make()
+                        ->color('warning'),
+                    DeleteAction::make(),
                 ])
             ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
