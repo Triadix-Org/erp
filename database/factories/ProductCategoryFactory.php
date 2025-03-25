@@ -2,13 +2,12 @@
 
 namespace Database\Factories;
 
-use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Division>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ProductCategory>
  */
-class DivisionFactory extends Factory
+class ProductCategoryFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -18,9 +17,9 @@ class DivisionFactory extends Factory
     public function definition(): array
     {
         return [
+            'code' => 'CT' . $this->faker->numberBetween(1, 1000),
             'name' => $this->faker->word(),
-            'description' => $this->faker->sentence(),
-            'director' => User::first()?->getKey() ?? User::factory()->create()->getKey(),
+            'desc' => $this->faker->sentence()
         ];
     }
 }
