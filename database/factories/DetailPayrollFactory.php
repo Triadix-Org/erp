@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Employee;
+use App\Models\Payroll;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +19,12 @@ class DetailPayrollFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'payroll_id' => Payroll::first()?->getKey() ?? Payroll::factory()->create()->getKey(),
+            'employee_id' => Employee::factory()->create()->getKey(),
+            'salary' => $this->faker->numberBetween(3000000, 10000000),
+            'total' => function (array $attributes) {
+                return $attributes['salary'];
+            }
         ];
     }
 }
