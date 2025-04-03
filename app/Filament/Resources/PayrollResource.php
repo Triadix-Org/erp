@@ -4,7 +4,9 @@ namespace App\Filament\Resources;
 
 use App\Enum\Month;
 use App\Filament\Resources\PayrollResource\Pages;
+use App\Filament\Resources\PayrollResource\Pages\ViewPayroll;
 use App\Filament\Resources\PayrollResource\RelationManagers;
+use App\Filament\Resources\PayrollResource\RelationManagers\DetailRelationManager;
 use App\Models\Employee;
 use App\Models\Payroll;
 use Filament\Forms;
@@ -153,7 +155,7 @@ class PayrollResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            DetailRelationManager::class,
         ];
     }
 
@@ -161,6 +163,7 @@ class PayrollResource extends Resource
     {
         return [
             'index' => Pages\ListPayrolls::route('/'),
+            'view' => Pages\ViewPayroll::route('/{record}/view'),
             'create' => Pages\CreatePayroll::route('/create'),
             'edit' => Pages\EditPayroll::route('/{record}/edit'),
         ];
