@@ -17,6 +17,10 @@ class Invoice extends Model
     public $timestamps = true;
     protected $guarded = [];
 
+    protected $casts = [
+        'date' => 'datetime',
+    ];
+
     public static function boot()
     {
         parent::boot();

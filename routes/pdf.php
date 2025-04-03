@@ -18,3 +18,6 @@ Route::get('/sales/sales-order/pdf/{orderNum}', [Pdf\SalesOrder::class, 'generat
 Route::get('/sales/proforma-invoice/pdf/{num}', [Pdf\Invoice::class, 'proforma'])->name('sales.proforma-invoice.pdf');
 Route::get('/sales/commercial-invoice/pdf/{num}', [Pdf\Invoice::class, 'commercial'])->name('sales.commercial-invoice.pdf');
 Route::get('/sales/quotation/pdf/{num}', Pdf\SalesMarketing\Quotation::class)->name('sales.quotation.pdf');
+
+Route::get('/sales/packing-list/pdf/{num}', Pdf\PackingList::class)->name('sales.packing-list.pdf');
+Route::get('/sales/shipping-marks/pdf/{num}', Pdf\ShippingMark::class)->name('sales.shipping-marks.pdf');

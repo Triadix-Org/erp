@@ -35,7 +35,7 @@ class CreatePayroll extends CreateRecord
                 'overtime'    => 0,
                 'bonus'       => 0,
                 'cut'         => 0,
-                'total'       => 0
+                'total'       => $employee->personnel?->sallary
             ];
         })->toArray();
     }

@@ -12,5 +12,14 @@ export default {
         "vendor/filament/**/*.blade.php",
         "vendor/awcodes/filament-table-repeater/resources/**/*.blade.php",
     ],
+    theme: {
+        fontFamily: {
+            sans: ["ui-sans-serif", "system-ui"],
+            serif: ["ui-serif", "Georgia"],
+            mono: ["ui-monospace", "SFMono-Regular"],
+            display: ["Oswald"],
+            body: ['"Open Sans"'],
+        },
+    },
     plugins: [require("flowbite/plugin")],
 };

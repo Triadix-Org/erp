@@ -16,4 +16,9 @@ class EditPayroll extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    public function mount(int|string $record): void
+    {
+        parent::mount($record);
+    }
 }

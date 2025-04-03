@@ -19,7 +19,10 @@ use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -50,7 +53,6 @@ class PayrollResource extends Resource
                                     ->required()
                                     ->numeric(),
                                 TableRepeater::make('detail')
-                                    ->orderable(false)
                                     ->addable(false)
                                     ->schema([
                                         TextInput::make('employee_id')
@@ -138,8 +140,9 @@ class PayrollResource extends Resource
                     ])
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
+                ViewAction::make()->color('info'),
+                EditAction::make()->color('warning'),
+            ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
