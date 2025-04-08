@@ -21,3 +21,6 @@ Route::get('/sales/quotation/pdf/{num}', Pdf\SalesMarketing\Quotation::class)->n
 
 Route::get('/sales/packing-list/pdf/{num}', Pdf\PackingList::class)->name('sales.packing-list.pdf');
 Route::get('/sales/shipping-marks/pdf/{num}', Pdf\ShippingMark::class)->name('sales.shipping-marks.pdf');
+
+// Human Resource
+Route::get('/hr/pay-slip/pdf/{id}', Pdf\PaySlip::class)->name('hr.pay-slip.pdf');
