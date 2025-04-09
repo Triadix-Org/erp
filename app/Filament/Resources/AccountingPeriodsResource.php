@@ -25,7 +25,7 @@ class AccountingPeriodsResource extends Resource
     protected static ?string $model = AccountingPeriods::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-calendar-date-range';
-    protected static ?string $navigationGroup = 'Accounting';
+    protected static ?string $navigationGroup = 'Master Accounting';
 
     public static function form(Form $form): Form
     {
