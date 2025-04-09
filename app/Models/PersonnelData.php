@@ -20,4 +20,14 @@ class PersonnelData extends Model
     {
         return $this->belongsTo(Employee::class, 'nip', 'nip');
     }
+
+    public function dept(): BelongsTo
+    {
+        return $this->belongsTo(Department::class, 'dept', 'id');
+    }
+
+    public function div(): BelongsTo
+    {
+        return $this->belongsTo(Department::class, 'div', 'id');
+    }
 }

@@ -4,15 +4,9 @@ namespace App\Filament\Resources;
 
 use App\Enum\Month;
 use App\Filament\Resources\PayrollResource\Pages;
-use App\Filament\Resources\PayrollResource\Pages\ViewPayroll;
-use App\Filament\Resources\PayrollResource\RelationManagers;
 use App\Filament\Resources\PayrollResource\RelationManagers\DetailRelationManager;
-use App\Models\Employee;
 use App\Models\Payroll;
-use Filament\Forms;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -21,16 +15,14 @@ use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Icetalker\FilamentTableRepeater\Forms\Components\TableRepeater;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PayrollResource extends Resource
 {
@@ -142,7 +134,12 @@ class PayrollResource extends Resource
                     ])
             ])
             ->actions([
-                ViewAction::make()->color('info'),
+                Action::make('detail')
+                    ->label('Detail')
+                    ->color('info')
+                    ->icon('heroicon-m-eye')
+                    ->url(fn($record) => route('filament.root.resources.payrolls.detail', ['record' => $record->getKey()]))
+                    ->openUrlInNewTab(),
                 EditAction::make()->color('warning'),
             ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
@@ -166,6 +163,7 @@ class PayrollResource extends Resource
             'view' => Pages\ViewPayroll::route('/{record}/view'),
             'create' => Pages\CreatePayroll::route('/create'),
             'edit' => Pages\EditPayroll::route('/{record}/edit'),
+            'detail' => Pages\DetailPayroll::route('/{record}/detail')
         ];
     }
 }
