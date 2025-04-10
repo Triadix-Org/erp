@@ -49,6 +49,7 @@ class ChartOfAccountResource extends Resource
                             ->required(),
                         Select::make('chart_of_account_id')
                             ->label('Turunan dari')
+                            ->searchable()
                             ->options(ChartOfAccount::pluck('name', 'id')),
                         Textarea::make('description')
                             ->columnSpanFull()
@@ -106,7 +107,8 @@ class ChartOfAccountResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->defaultSort('code', 'asc');
     }
 
     public static function getPages(): array

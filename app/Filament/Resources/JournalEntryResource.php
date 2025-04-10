@@ -99,11 +99,18 @@ class JournalEntryResource extends Resource
                     ->reorderable()
                     ->schema([
                         Select::make('chart_of_account_id')
-                            ->options(ChartOfAccount::pluck('name', 'id'))
+                            // ->options(ChartOfAccount::pluck('name', 'id'))
+                            ->options(function () {
+                                return ChartOfAccount::get()->mapWithKeys(function ($coa) {
+                                    return [
+                                        $coa->id => "{$coa->code} - {$coa->name}",
+                                    ];
+                                });
+                            })
                             ->required()
-                            ->label('COA'),
+                            ->label('COA')
+                            ->searchable(['code', 'name']),
                         TextInput::make('description')
-                            ->required()
                             ->label('Keterangan'),
                         TextInput::make('debit')
                             ->default(0)
