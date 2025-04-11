@@ -10,6 +10,7 @@ use App\Models\AccountingPeriods;
 use App\Models\ChartOfAccount;
 use App\Models\HeaderPurchaseOrder;
 use App\Models\HeaderSalesOrder;
+use App\Models\Invoice;
 use App\Models\JournalEntry;
 use App\Models\Payroll;
 use Filament\Forms;
@@ -156,18 +157,15 @@ class JournalEntryResource extends Resource
                 TextColumn::make('source_id')
                     ->label('Referensi')
                     ->formatStateUsing(function ($state, $record) {
-                        $source = $record->source;
-
-                        if ($source == JournalSource::PO->value) {
-                            return HeaderPurchaseOrder::find($state)->code;
-                        } else if ($source == JournalSource::SALES->value) {
-                            return HeaderSalesOrder::find($state)->code;
-                        } else if ($source == JournalSource::PAYROLL->value) {
-                            $payroll = Payroll::find($state);
-                            return $payroll->month . ' ' . $payroll->year;
-                        }
-
-                        return '-';
+                        return match ($record->source) {
+                            JournalSource::PO->value => optional(HeaderPurchaseOrder::find($state))->code ?? '-',
+                            JournalSource::SALES->value => optional(Invoice::find($state))->inv_no ?? '-',
+                            JournalSource::PAYROLL->value => function () use ($state) {
+                                $payroll = Payroll::find($state);
+                                return $payroll ? "{$payroll->month} {$payroll->year}" : '-';
+                            },
+                            default => '-',
+                        };
                     })
                     ->sortable()
                     ->searchable(),

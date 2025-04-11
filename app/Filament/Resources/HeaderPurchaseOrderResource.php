@@ -15,6 +15,7 @@ use App\Models\HeaderRequestOrder;
 use App\Models\JournalEntry;
 use App\Models\Product;
 use App\Models\Supplier;
+use App\Services\PostingJournal;
 use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Components\Checkbox;
@@ -376,7 +377,8 @@ class HeaderPurchaseOrderResource extends Resource
                                 ])
                         ])
                         ->action(function (array $data, HeaderPurchaseOrder $record) {
-                            self::posting($data, $record);
+                            $posting = new PostingJournal();
+                            $posting($data, $record, JournalSource::PO->value);
                         })
                         ->slideOver()
                     // ->visible(fn($record) => $record->app_finance == 1 &&
@@ -486,49 +488,49 @@ class HeaderPurchaseOrderResource extends Resource
         }
     }
 
-    public static function posting($data, $record)
-    {
-        DB::beginTransaction();
-        try {
-            $payload = [
-                'ref' => $record->code,
-                'date' => $data['date'],
-                'description' => $data['header_description'],
-                'source' => JournalSource::PO->value,
-                'source_id' => $record->getKey(),
-                'status' => 1,
-                'accounting_periods_id' => $data['accounting_periods']
-            ];
+    // public static function posting($data, $record)
+    // {
+    //     DB::beginTransaction();
+    //     try {
+    //         $payload = [
+    //             'ref' => $record->code,
+    //             'date' => $data['date'],
+    //             'description' => $data['header_description'],
+    //             'source' => JournalSource::PO->value,
+    //             'source_id' => $record->getKey(),
+    //             'status' => 1,
+    //             'accounting_periods_id' => $data['accounting_periods']
+    //         ];
 
-            $entry = JournalEntry::create($payload);
+    //         $entry = JournalEntry::create($payload);
 
-            $payloadDetails = [];
-            foreach ($data['details'] as $detail) {
-                $payloadDetails[] = [
-                    'journal_entry_id' => $entry->getKey(),
-                    'chart_of_account_id' => $detail['chart_of_account_id'],
-                    'description' => $detail['description'],
-                    'debit' => $detail['debit'] ?? 0,
-                    'kredit' => $detail['kredit'] ?? 0,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
-            }
+    //         $payloadDetails = [];
+    //         foreach ($data['details'] as $detail) {
+    //             $payloadDetails[] = [
+    //                 'journal_entry_id' => $entry->getKey(),
+    //                 'chart_of_account_id' => $detail['chart_of_account_id'],
+    //                 'description' => $detail['description'],
+    //                 'debit' => $detail['debit'] ?? 0,
+    //                 'kredit' => $detail['kredit'] ?? 0,
+    //                 'created_at' => now(),
+    //                 'updated_at' => now(),
+    //             ];
+    //         }
 
-            DetailJournalEntry::insert($payloadDetails);
+    //         DetailJournalEntry::insert($payloadDetails);
 
-            DB::commit();
-            Notification::make()
-                ->title('Saved successfully')
-                ->success()
-                ->send();
-        } catch (Throwable $th) {
-            DB::rollBack();
-            Notification::make()
-                ->title('Opps.. Something went wrong!')
-                ->body($th->getMessage())
-                ->danger()
-                ->send();
-        }
-    }
+    //         DB::commit();
+    //         Notification::make()
+    //             ->title('Saved successfully')
+    //             ->success()
+    //             ->send();
+    //     } catch (Throwable $th) {
+    //         DB::rollBack();
+    //         Notification::make()
+    //             ->title('Opps.. Something went wrong!')
+    //             ->body($th->getMessage())
+    //             ->danger()
+    //             ->send();
+    //     }
+    // }
 }
