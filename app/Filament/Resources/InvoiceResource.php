@@ -2,13 +2,19 @@
 
 namespace App\Filament\Resources;
 
+use App\Enum\Accounting\JournalSource;
 use App\Enum\PaymentStatus;
 use App\Filament\Resources\InvoiceResource\Pages;
 use App\Filament\Resources\InvoiceResource\RelationManagers;
+use App\Models\AccountingPeriods;
+use App\Models\ChartOfAccount;
 use App\Models\Customer;
+use App\Models\DetailJournalEntry;
 use App\Models\HeaderSalesOrder;
 use App\Models\Invoice;
+use App\Models\JournalEntry;
 use App\Models\Product;
+use App\Services\PostingJournal;
 use Carbon\Carbon;
 use DateTime;
 use Filament\Forms;
@@ -36,6 +42,7 @@ use Icetalker\FilamentTableRepeater\Forms\Components\TableRepeater;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class InvoiceResource extends Resource
@@ -211,6 +218,52 @@ class InvoiceResource extends Resource
                     Tables\Actions\EditAction::make()
                         ->color('warning'),
                     Tables\Actions\DeleteAction::make(),
+                    Action::make('postingJournal')
+                        ->label('Posting ke Jurnal')
+                        ->color('info')
+                        ->modalWidth('7xl')
+                        ->modalDescription('Tindakan ini akan menambah Jurnal Entri dan status entri adalah Posted.')
+                        ->form([
+                            Grid::make(3)
+                                ->schema([
+                                    DatePicker::make('date')
+                                        ->required()
+                                        ->default(now())
+                                        ->label('Tanggal'),
+                                    Select::make('accounting_periods')
+                                        ->label('Periode')
+                                        ->options(AccountingPeriods::open()->pluck('name', 'id'))
+                                        ->searchable()
+                                        ->required(),
+                                    TextInput::make('header_description')
+                                        ->label('Catatan'),
+                                ]),
+                            TableRepeater::make('details')
+                                ->label(false)
+                                ->schema([
+                                    Select::make('chart_of_account_id')
+                                        ->label('CoA')
+                                        ->required()
+                                        ->options(ChartOfAccount::pluck('name', 'id'))
+                                        ->default(11)
+                                        ->searchable(),
+                                    TextInput::make('description')
+                                        ->label('Keterangan'),
+                                    TextInput::make('debit')
+                                        ->numeric(),
+                                    TextInput::make('kredit')
+                                        ->numeric(),
+                                ])
+                                ->colStyles([
+                                    'debit' => 'width: 15%;',
+                                    'kredit' => 'width: 15%;',
+                                ])
+                        ])
+                        ->action(function (array $data, Invoice $record) {
+                            $posting = new PostingJournal();
+                            $posting($data, $record, JournalSource::SALES->value);
+                        })
+                        ->slideOver()
                 ])
                     ->tooltip('Actions'),
                 Action::make('openModal')
@@ -226,8 +279,6 @@ class InvoiceResource extends Resource
                         return 'Documents - ' . $record->inv_no;
                     })
                     ->modalSubmitAction(false)
-
-
             ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

@@ -8,6 +8,7 @@ use App\Models\AccountingPeriods;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -36,14 +37,19 @@ class AccountingPeriodsResource extends Resource
                     ->schema([
                         TextInput::make('name')
                             ->label('Nama')
-                            ->required()
-                            ->columnSpanFull(),
+                            ->required(),
+                        Select::make('is_closed')
+                            ->options([
+                                1 => 'Closed',
+                                0 => 'Open',
+                            ])
+                            ->default(0),
                         DatePicker::make('start_date')
                             ->label('Tanggal Mulai')
                             ->required(),
                         DatePicker::make('end_date')
                             ->label('Tanggal Selesai')
-                            ->required()
+                            ->required(),
                     ])
             ]);
     }

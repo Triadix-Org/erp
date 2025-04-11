@@ -25,6 +25,11 @@ class GeneralLedger extends Page implements HasForms
     public $openBalance = 0;
     public $coa;
 
+    public function mount()
+    {
+        $this->periods = AccountingPeriods::open()?->first()->id;
+    }
+
     protected function getFormSchema(): array
     {
         return [
@@ -39,16 +44,23 @@ class GeneralLedger extends Page implements HasForms
                                         ->label('Periode')
                                         ->options(AccountingPeriods::pluck('name', 'id'))
                                         ->default($this->periods)
+                                        ->live()
+                                        ->afterStateUpdated(function ($state) {
+                                            $this->periods = $state;
+                                        })
                                         ->required(),
                                     Select::make('include_open_balance')
                                         ->label('Tampilkan Opening Balance')
                                         ->default($this->openBalance)
+                                        ->reactive()
+                                        ->afterStateUpdated(fn($state) => $this->openBalance = $state)
                                         ->options([
                                             1 => 'Ya',
                                             0 => 'Tidak',
                                         ])
                                 ]),
                             Select::make('chart_of_account_id')
+                                ->reactive()
                                 ->default($this->coa)
                                 ->label('CoA')
                                 ->options(ChartOfAccount::pluck('name', 'id'))
