@@ -2,17 +2,23 @@
 
 namespace App\Filament\Resources;
 
+use App\Enum\Accounting\JournalSource;
 use App\Enum\PaymentStatus;
 use App\Filament\Resources\HeaderPurchaseOrderResource\Pages;
 use App\Filament\Resources\HeaderPurchaseOrderResource\RelationManagers;
+use App\Models\AccountingPeriods;
+use App\Models\ChartOfAccount;
+use App\Models\DetailJournalEntry;
 use App\Models\DetailRequestOrder;
 use App\Models\HeaderPurchaseOrder;
 use App\Models\HeaderRequestOrder;
+use App\Models\JournalEntry;
 use App\Models\Product;
 use App\Models\Supplier;
 use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -328,6 +334,53 @@ class HeaderPurchaseOrderResource extends Resource
                         })
                         ->visible(fn($record) => $record->app_finance == 1 &&
                             (Auth::user()->hasRole('super_admin') || Auth::user()->hasRole('Finance'))),
+                    Action::make('postingJournal')
+                        ->label('Posting ke Jurnal')
+                        ->color('info')
+                        ->modalWidth('7xl')
+                        ->modalDescription('Tindakan ini akan menambah Jurnal Entri dan status entri adalah Posted.')
+                        ->form([
+                            Grid::make(3)
+                                ->schema([
+                                    DatePicker::make('date')
+                                        ->required()
+                                        ->default(now())
+                                        ->label('Tanggal'),
+                                    Select::make('accounting_periods')
+                                        ->label('Periode')
+                                        ->options(AccountingPeriods::open()->pluck('name', 'id'))
+                                        ->searchable()
+                                        ->required(),
+                                    TextInput::make('header_description')
+                                        ->label('Catatan'),
+                                ]),
+                            TableRepeater::make('details')
+                                ->label(false)
+                                ->schema([
+                                    Select::make('chart_of_account_id')
+                                        ->label('CoA')
+                                        ->required()
+                                        ->options(ChartOfAccount::pluck('name', 'id'))
+                                        ->default(8)
+                                        ->searchable(),
+                                    TextInput::make('description')
+                                        ->label('Keterangan'),
+                                    TextInput::make('debit')
+                                        ->numeric(),
+                                    TextInput::make('kredit')
+                                        ->numeric(),
+                                ])
+                                ->colStyles([
+                                    'debit' => 'width: 15%;',
+                                    'kredit' => 'width: 15%;',
+                                ])
+                        ])
+                        ->action(function (array $data, HeaderPurchaseOrder $record) {
+                            self::posting($data, $record);
+                        })
+                        ->slideOver()
+                    // ->visible(fn($record) => $record->app_finance == 1 &&
+                    //     (Auth::user()->hasRole('super_admin') || Auth::user()->hasRole('Finance'))),
                 ])
             ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
@@ -417,6 +470,52 @@ class HeaderPurchaseOrderResource extends Resource
                 $record->finance_by  = Auth::user()->email;
                 $record->save();
             }
+
+            DB::commit();
+            Notification::make()
+                ->title('Saved successfully')
+                ->success()
+                ->send();
+        } catch (Throwable $th) {
+            DB::rollBack();
+            Notification::make()
+                ->title('Opps.. Something went wrong!')
+                ->body($th->getMessage())
+                ->danger()
+                ->send();
+        }
+    }
+
+    public static function posting($data, $record)
+    {
+        DB::beginTransaction();
+        try {
+            $payload = [
+                'ref' => $record->code,
+                'date' => $data['date'],
+                'description' => $data['header_description'],
+                'source' => JournalSource::PO->value,
+                'source_id' => $record->getKey(),
+                'status' => 1,
+                'accounting_periods_id' => $data['accounting_periods']
+            ];
+
+            $entry = JournalEntry::create($payload);
+
+            $payloadDetails = [];
+            foreach ($data['details'] as $detail) {
+                $payloadDetails[] = [
+                    'journal_entry_id' => $entry->getKey(),
+                    'chart_of_account_id' => $detail['chart_of_account_id'],
+                    'description' => $detail['description'],
+                    'debit' => $detail['debit'] ?? 0,
+                    'kredit' => $detail['kredit'] ?? 0,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+
+            DetailJournalEntry::insert($payloadDetails);
 
             DB::commit();
             Notification::make()
