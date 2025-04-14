@@ -55,4 +55,14 @@ class HeaderRequestOrder extends Model
     {
         return $this->hasOne(User::class, 'email', 'approved_by');
     }
+
+    public function scopeApproved($query)
+    {
+        return $query->where('app_manager', 1);
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('status', 1);
+    }
 }
