@@ -64,11 +64,8 @@ class HeaderRequestOrderResource extends Resource
                             ->schema([
                                 Select::make('product_id')
                                     ->label('Product')
-                                    ->relationship(
-                                        name: 'product',
-                                        titleAttribute: 'name',
-                                        modifyQueryUsing: fn(Builder $query) => $query->where('status', 1),
-                                    )
+                                    ->options(Product::isActive()->pluck('name', 'id'))
+                                    ->searchable()
                                     ->required(),
 
                                 TextInput::make('qty')

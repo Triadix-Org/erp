@@ -73,9 +73,6 @@
             </tr>
         </table>
 
-
-
-
         <div class="sign">
             <table class="signature-table">
                 <thead>
@@ -118,9 +115,6 @@
                 </tfoot>
             </table>
         </div>
-        {{-- <img src="data:image/png;base64, {!! base64_encode(
-            QrCode::format('png')->size(120)->generate(env('APP_URL') . 'sales/order-production/pdf/' . $code),
-        ) !!}" alt="QR Code"> --}}
 
     </main>
     @include('pdf.partials.footer')

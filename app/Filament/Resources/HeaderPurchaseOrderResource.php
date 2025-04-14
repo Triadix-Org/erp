@@ -23,6 +23,7 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
@@ -76,10 +77,7 @@ class HeaderPurchaseOrderResource extends Resource
                                     ->searchable()
                                     ->required(),
                                 Forms\Components\Select::make('header_request_order_id')
-                                    ->relationship('header_request_order', 'code', function ($query) {
-                                        return $query->where('status', 1);
-                                    })
-                                    ->options(HeaderRequestOrder::where('status', 1)->pluck('code', 'id'))
+                                    ->options(HeaderRequestOrder::active()->approved()->pluck('code', 'id'))
                                     ->label('Request Order')
                                     ->reactive()
                                     ->searchable()
@@ -88,7 +86,6 @@ class HeaderPurchaseOrderResource extends Resource
 
                                         if ($headerRequestOrderId) {
                                             $details = DetailRequestOrder::with('product:id,price')->where('header_request_order_id', $headerRequestOrderId)->get();
-                                            // dd($details);
 
                                             $set('details', $details->map(fn($detail) => [
                                                 $total = $detail->product->price * $detail->qty,
@@ -102,11 +99,11 @@ class HeaderPurchaseOrderResource extends Resource
                                             $set('details', []);
                                         }
                                     }),
-                                Forms\Components\DatePicker::make('payment_due')
+                                DatePicker::make('payment_due')
                                     ->required(),
-                                Forms\Components\Textarea::make('payment_terms')
+                                Textarea::make('payment_terms')
                                     ->cols(3),
-                                Forms\Components\Textarea::make('incoterms')
+                                Textarea::make('incoterms')
                                     ->cols(3),
                             ]),
                         TableRepeater::make('details')
@@ -127,6 +124,7 @@ class HeaderPurchaseOrderResource extends Resource
                                             $set('price', $product->price);
                                         }
                                     })
+                                    ->searchable()
                                     ->required(),
 
                                 TextInput::make('price')
@@ -155,7 +153,7 @@ class HeaderPurchaseOrderResource extends Resource
 
                             ])
                             ->reorderable()
-                            ->addable(false)
+                            ->addable()
                             ->columnSpan('full'),
                         Grid::make()
                             ->schema([
@@ -487,50 +485,4 @@ class HeaderPurchaseOrderResource extends Resource
                 ->send();
         }
     }
-
-    // public static function posting($data, $record)
-    // {
-    //     DB::beginTransaction();
-    //     try {
-    //         $payload = [
-    //             'ref' => $record->code,
-    //             'date' => $data['date'],
-    //             'description' => $data['header_description'],
-    //             'source' => JournalSource::PO->value,
-    //             'source_id' => $record->getKey(),
-    //             'status' => 1,
-    //             'accounting_periods_id' => $data['accounting_periods']
-    //         ];
-
-    //         $entry = JournalEntry::create($payload);
-
-    //         $payloadDetails = [];
-    //         foreach ($data['details'] as $detail) {
-    //             $payloadDetails[] = [
-    //                 'journal_entry_id' => $entry->getKey(),
-    //                 'chart_of_account_id' => $detail['chart_of_account_id'],
-    //                 'description' => $detail['description'],
-    //                 'debit' => $detail['debit'] ?? 0,
-    //                 'kredit' => $detail['kredit'] ?? 0,
-    //                 'created_at' => now(),
-    //                 'updated_at' => now(),
-    //             ];
-    //         }
-
-    //         DetailJournalEntry::insert($payloadDetails);
-
-    //         DB::commit();
-    //         Notification::make()
-    //             ->title('Saved successfully')
-    //             ->success()
-    //             ->send();
-    //     } catch (Throwable $th) {
-    //         DB::rollBack();
-    //         Notification::make()
-    //             ->title('Opps.. Something went wrong!')
-    //             ->body($th->getMessage())
-    //             ->danger()
-    //             ->send();
-    //     }
-    // }
 }
