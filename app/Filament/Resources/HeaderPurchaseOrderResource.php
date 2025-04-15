@@ -2,20 +2,28 @@
 
 namespace App\Filament\Resources;
 
+use App\Enum\Accounting\JournalSource;
 use App\Enum\PaymentStatus;
 use App\Filament\Resources\HeaderPurchaseOrderResource\Pages;
 use App\Filament\Resources\HeaderPurchaseOrderResource\RelationManagers;
+use App\Models\AccountingPeriods;
+use App\Models\ChartOfAccount;
+use App\Models\DetailJournalEntry;
 use App\Models\DetailRequestOrder;
 use App\Models\HeaderPurchaseOrder;
 use App\Models\HeaderRequestOrder;
+use App\Models\JournalEntry;
 use App\Models\Product;
 use App\Models\Supplier;
+use App\Services\PostingJournal;
 use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
@@ -69,10 +77,7 @@ class HeaderPurchaseOrderResource extends Resource
                                     ->searchable()
                                     ->required(),
                                 Forms\Components\Select::make('header_request_order_id')
-                                    ->relationship('header_request_order', 'code', function ($query) {
-                                        return $query->where('status', 1);
-                                    })
-                                    ->options(HeaderRequestOrder::where('status', 1)->pluck('code', 'id'))
+                                    ->options(HeaderRequestOrder::active()->approved()->pluck('code', 'id'))
                                     ->label('Request Order')
                                     ->reactive()
                                     ->searchable()
@@ -81,7 +86,6 @@ class HeaderPurchaseOrderResource extends Resource
 
                                         if ($headerRequestOrderId) {
                                             $details = DetailRequestOrder::with('product:id,price')->where('header_request_order_id', $headerRequestOrderId)->get();
-                                            // dd($details);
 
                                             $set('details', $details->map(fn($detail) => [
                                                 $total = $detail->product->price * $detail->qty,
@@ -95,11 +99,11 @@ class HeaderPurchaseOrderResource extends Resource
                                             $set('details', []);
                                         }
                                     }),
-                                Forms\Components\DatePicker::make('payment_due')
+                                DatePicker::make('payment_due')
                                     ->required(),
-                                Forms\Components\Textarea::make('payment_terms')
+                                Textarea::make('payment_terms')
                                     ->cols(3),
-                                Forms\Components\Textarea::make('incoterms')
+                                Textarea::make('incoterms')
                                     ->cols(3),
                             ]),
                         TableRepeater::make('details')
@@ -120,6 +124,7 @@ class HeaderPurchaseOrderResource extends Resource
                                             $set('price', $product->price);
                                         }
                                     })
+                                    ->searchable()
                                     ->required(),
 
                                 TextInput::make('price')
@@ -148,7 +153,7 @@ class HeaderPurchaseOrderResource extends Resource
 
                             ])
                             ->reorderable()
-                            ->addable(false)
+                            ->addable()
                             ->columnSpan('full'),
                         Grid::make()
                             ->schema([
@@ -328,6 +333,54 @@ class HeaderPurchaseOrderResource extends Resource
                         })
                         ->visible(fn($record) => $record->app_finance == 1 &&
                             (Auth::user()->hasRole('super_admin') || Auth::user()->hasRole('Finance'))),
+                    Action::make('postingJournal')
+                        ->label('Posting ke Jurnal')
+                        ->color('info')
+                        ->modalWidth('7xl')
+                        ->modalDescription('Tindakan ini akan menambah Jurnal Entri dan status entri adalah Posted.')
+                        ->form([
+                            Grid::make(3)
+                                ->schema([
+                                    DatePicker::make('date')
+                                        ->required()
+                                        ->default(now())
+                                        ->label('Tanggal'),
+                                    Select::make('accounting_periods')
+                                        ->label('Periode')
+                                        ->options(AccountingPeriods::open()->pluck('name', 'id'))
+                                        ->searchable()
+                                        ->required(),
+                                    TextInput::make('header_description')
+                                        ->label('Catatan'),
+                                ]),
+                            TableRepeater::make('details')
+                                ->label(false)
+                                ->schema([
+                                    Select::make('chart_of_account_id')
+                                        ->label('CoA')
+                                        ->required()
+                                        ->options(ChartOfAccount::pluck('name', 'id'))
+                                        ->default(8)
+                                        ->searchable(),
+                                    TextInput::make('description')
+                                        ->label('Keterangan'),
+                                    TextInput::make('debit')
+                                        ->numeric(),
+                                    TextInput::make('kredit')
+                                        ->numeric(),
+                                ])
+                                ->colStyles([
+                                    'debit' => 'width: 15%;',
+                                    'kredit' => 'width: 15%;',
+                                ])
+                        ])
+                        ->action(function (array $data, HeaderPurchaseOrder $record) {
+                            $posting = new PostingJournal();
+                            $posting($data, $record, JournalSource::PO->value);
+                        })
+                        ->slideOver()
+                    // ->visible(fn($record) => $record->app_finance == 1 &&
+                    //     (Auth::user()->hasRole('super_admin') || Auth::user()->hasRole('Finance'))),
                 ])
             ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([

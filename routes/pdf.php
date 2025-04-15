@@ -24,3 +24,6 @@ Route::get('/sales/shipping-marks/pdf/{num}', Pdf\ShippingMark::class)->name('sa
 
 // Human Resource
 Route::get('/hr/pay-slip/pdf/{id}', Pdf\PaySlip::class)->name('hr.pay-slip.pdf');
+
+// Accounting
+Route::get('/accounting/general-ledger/pdf/{openBalance}/{periods}', Pdf\Accounting\GeneralLedger::class)->name('accounting.general-ledger');

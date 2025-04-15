@@ -67,6 +67,7 @@ class RootPanelProvider extends PanelProvider
             ->databaseNotifications()
             ->brandLogo(asset('images/primary-logo.png'))
             ->darkModeBrandLogo(asset('images/primary-logo-white.png'))
-            ->brandLogoHeight('3rem');;
+            ->brandLogoHeight('3rem')
+            ->sidebarCollapsibleOnDesktop();
     }
 }
