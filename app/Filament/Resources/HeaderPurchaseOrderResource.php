@@ -15,6 +15,7 @@ use App\Models\HeaderRequestOrder;
 use App\Models\JournalEntry;
 use App\Models\Product;
 use App\Models\Supplier;
+use App\Models\Tax;
 use App\Services\PostingJournal;
 use Carbon\Carbon;
 use Filament\Forms;
@@ -162,15 +163,21 @@ class HeaderPurchaseOrderResource extends Resource
                                     ->readOnly()
                                     ->numeric()
                                     ->default(0),
-                                Forms\Components\TextInput::make('total_tax')
+                                Select::make('tax_id')
+                                    ->label('Tax Type')
                                     ->required()
+                                    ->options(Tax::pluck('name', 'id'))
                                     ->reactive()
-                                    ->afterStateUpdated(function (Get $get, Set $set) {
+                                    ->afterStateUpdated(function ($state, Get $get, Set $set) {
+                                        $subtotal = $get('subtotal');
+                                        $taxRate = Tax::find($state)->rate;
+
+                                        $totalTax = ($subtotal * $taxRate) / 100;
+                                        $set('total_tax', $totalTax);
+
                                         self::updateTotals($get, $set);
                                     })
-                                    ->debounce(1000)
-                                    ->numeric()
-                                    ->default(0),
+                                    ->searchable(),
                                 Forms\Components\TextInput::make('total_disc')
                                     ->required()
                                     ->label('Discount')
@@ -180,6 +187,12 @@ class HeaderPurchaseOrderResource extends Resource
                                         self::updateTotals($get, $set);
                                     })
                                     ->debounce(1000)
+                                    ->default(0),
+                                Forms\Components\TextInput::make('total_tax')
+                                    ->required()
+                                    ->readOnly()
+                                    ->debounce(1000)
+                                    ->numeric()
                                     ->default(0),
                                 Forms\Components\TextInput::make('total_amount')
                                     ->required()
