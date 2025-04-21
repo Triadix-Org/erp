@@ -2,10 +2,12 @@
 
 namespace App\Filament\Resources;
 
+use App\Enum\Employee\Education;
 use App\Filament\Resources\JobVacancyResource\Pages;
 use App\Filament\Resources\JobVacancyResource\RelationManagers;
 use App\Models\JobVacancy;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -71,6 +73,7 @@ class JobVacancyResource extends Resource
                         Forms\Components\Section::make()
                             ->schema([
                                 Forms\Components\DatePicker::make('post_date')
+                                    ->default(now())
                                     ->required(),
                                 Forms\Components\DatePicker::make('close_date'),
                                 Forms\Components\TextInput::make('salary')
@@ -91,8 +94,8 @@ class JobVacancyResource extends Resource
                                         1 => 'WFO',
                                         2 => 'Remote',
                                     ]),
-                                Forms\Components\TextInput::make('minimum_education')
-                                    ->maxLength(255),
+                                Select::make('minimum_education')
+                                    ->options(Education::labels()),
                                 Forms\Components\TextInput::make('years_of_experience')
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('location')

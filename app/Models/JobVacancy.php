@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enum\Employee\Education;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -17,6 +18,10 @@ class JobVacancy extends Model
     protected $appends = ['contract_type_str', 'working_type_str'];
     public $timestamps = true;
     protected $guarded = [];
+
+    protected $casts = [
+        'minimum_education' => Education::class,
+    ];
 
     protected static function boot()
     {

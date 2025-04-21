@@ -231,7 +231,8 @@ class InvoiceResource extends Resource
             ->actions([
                 ActionGroup::make([
                     ViewAction::make()
-                        ->color('info'),
+                        ->color('info')
+                        ->modalWidth('6xl'),
                     Tables\Actions\EditAction::make()
                         ->color('warning'),
                     Tables\Actions\DeleteAction::make(),
