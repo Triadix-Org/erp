@@ -12,6 +12,8 @@ use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -67,8 +69,19 @@ class HeaderSalesOrderResource extends Resource
                             ->searchable()
                             ->options(Product::pluck('name', 'id'))
                             ->required(),
-
                         TextInput::make('qty')
+                            ->required()
+                            ->reactive()
+                            ->debounce()
+                            ->afterStateUpdated(function (Set $set, $state, Get $get) {
+                                $productId = $get('product_id');
+                                $product = Product::find($productId);
+                                if ($product) {
+                                    $calculatedPrice = $product->price * $state;
+                                    // dd($calculatedPrice);
+                                    $set('total_amount', $calculatedPrice);
+                                }
+                            })
                             ->numeric(),
                     ])
                     ->reorderable()

@@ -38,6 +38,7 @@ class HeaderRequestOrder extends Model
             // Format angka dengan leading zero (pad dengan 6 digit)
             $itemNumber = $code . str_pad($newNumber, 6, '0', STR_PAD_LEFT);
             $model->code = $itemNumber;
+            $model->status = 1;
         });
     }
 
