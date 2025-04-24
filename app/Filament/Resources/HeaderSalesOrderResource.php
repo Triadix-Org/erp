@@ -159,8 +159,11 @@ class HeaderSalesOrderResource extends Resource
             ])
             ->actions([
                 ActionGroup::make([
-                    Tables\Actions\EditAction::make(),
-                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\EditAction::make()
+                        ->color('warning')
+                        ->visible(fn($record) => $record->app_manager == 0),
+                    Tables\Actions\DeleteAction::make()
+                        ->visible(fn($record) => $record->app_manager == 0),
                     Action::make('setStatusProcess')
                         ->label('Process Order')
                         ->icon('heroicon-o-check')
@@ -276,7 +279,7 @@ class HeaderSalesOrderResource extends Resource
 
             $record = HeaderSalesOrder::where('code', $orderNumber)->first();
             $record->app_manager = 1;
-            $record->app_manager_by = Auth::user()->email;
+            $record->app_manager_by = Auth::user()->id;
             $record->save();
 
             DB::commit();

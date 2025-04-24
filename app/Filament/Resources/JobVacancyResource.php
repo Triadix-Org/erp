@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Enum\Employee\Education;
 use App\Filament\Resources\JobVacancyResource\Pages;
 use App\Filament\Resources\JobVacancyResource\RelationManagers;
+use App\Models\Department;
 use App\Models\JobVacancy;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
@@ -79,8 +80,11 @@ class JobVacancyResource extends Resource
                                 Forms\Components\TextInput::make('salary')
                                     ->prefix('Rp. ')
                                     ->numeric(),
-                                Forms\Components\TextInput::make('dept_div')
-                                    ->maxLength(255),
+                                Forms\Components\Select::make('department_id')
+                                    ->options(Department::all()->pluck('name', 'id'))
+                                    ->searchable()
+                                    ->label('Department')
+                                    ->required(),
                                 Forms\Components\Select::make('contract_type')
                                     ->options([
                                         1 => 'Internship',
@@ -122,7 +126,7 @@ class JobVacancyResource extends Resource
                     ->prefix('Rp. ')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('dept_div')
+                Tables\Columns\TextColumn::make('department.name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('contract_type_str')
                     ->sortable()
