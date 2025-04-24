@@ -36,8 +36,7 @@ class Settings extends Page implements HasForms
 
     public function mount(): void
     {
-        $this->companyCode = env('COMPANY_CODE');
-        $setting = Setting::where('company_code', $this->companyCode)->first();
+        $setting = Setting::first();
 
         if ($setting) {
             // Isi data ke properti publik
@@ -108,7 +107,7 @@ class Settings extends Page implements HasForms
     {
         try {
             DB::beginTransaction();
-            $setting = Setting::where('company_code', $this->company_code)->first();
+            $setting = Setting::first();
 
             if ($setting) {
                 // Update data

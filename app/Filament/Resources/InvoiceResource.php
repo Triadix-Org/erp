@@ -14,6 +14,7 @@ use App\Models\HeaderSalesOrder;
 use App\Models\Invoice;
 use App\Models\JournalEntry;
 use App\Models\Product;
+use App\Models\Tax;
 use App\Services\PostingJournal;
 use Carbon\Carbon;
 use DateTime;
@@ -70,6 +71,7 @@ class InvoiceResource extends Resource
                                             ->required(),
                                         Select::make('customer_id')
                                             ->label('Customer')
+                                            ->required()
                                             ->searchable()
                                             ->options(Customer::pluck('name', 'id')),
                                         Select::make('header_sales_order_id')
@@ -137,6 +139,22 @@ class InvoiceResource extends Resource
                                     }),
                                 Grid::make(2)
                                     ->schema([
+                                        Select::make('tax_id')
+                                        ->label('Tax Type')
+                                        ->required()
+                                        ->options(Tax::pluck('name', 'id'))
+                                        ->reactive()
+                                        ->searchable()
+                                        ->afterStateUpdated(function (Set $set, Get $get, $state) {
+                                            $tax = Tax::find($state);
+                                            $totalTax = $get('total_amount') * ($tax->rate / 100);
+                                            if ($tax) {
+                                                $set('total_tax', $totalTax);
+                                            } else {
+                                                $set('total_tax', 0);
+                                            }
+                                            self::updatedDetails($set, $get);
+                                        }),
                                         TextInput::make('total_tax')
                                             ->numeric()
                                             ->reactive()
@@ -150,9 +168,8 @@ class InvoiceResource extends Resource
                                             ->required()
                                             ->readOnly()
                                             ->default(0),
-
-                                        Textarea::make('payment_terms')
-                                            ->rows(3)
+                                        TextInput::make('payment_terms')
+                                            ->label('Payment Terms')
                                             ->required(),
                                         Textarea::make('note')
                                             ->rows(3),
@@ -214,7 +231,8 @@ class InvoiceResource extends Resource
             ->actions([
                 ActionGroup::make([
                     ViewAction::make()
-                        ->color('info'),
+                        ->color('info')
+                        ->modalWidth('6xl'),
                     Tables\Actions\EditAction::make()
                         ->color('warning'),
                     Tables\Actions\DeleteAction::make(),

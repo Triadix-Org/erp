@@ -15,13 +15,13 @@
 ?>
 <x-filament-panels::page>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <div class="bg-white w-full rounded-xl border px-10 py-2">
+    <div class="bg-white dark:bg-gray-900 w-full rounded-xl border dark:border-gray-700 px-10 py-2">
         <div class="flex gap-10 items-center justify-between">
             <div>
-                <div class="text-3xl font-bold text-teal-500 mb-4">
+                <div class="text-3xl font-bold text-teal-300 mb-4">
                     {{$good}} {{$user->name}}
                 </div>
-                <div class="text-xl">
+                <div class="text-xl dark:text-white">
                     Selamat datang di XERP!
                 </div>
             </div>

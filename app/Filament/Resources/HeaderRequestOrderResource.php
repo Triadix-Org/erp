@@ -128,8 +128,8 @@ class HeaderRequestOrderResource extends Resource
             ])
             ->actions([
                 ActionGroup::make([
-                    Tables\Actions\EditAction::make(),
-                    DeleteAction::make(),
+                    Tables\Actions\EditAction::make()->visible(fn($record) => $record->app_manager == 0),
+                    DeleteAction::make()->visible(fn($record) => $record->app_manager == 0),
                     Action::make('approveRequest')
                         ->label('Approve')
                         ->icon('heroicon-o-check')
