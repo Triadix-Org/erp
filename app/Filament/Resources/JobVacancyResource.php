@@ -2,10 +2,13 @@
 
 namespace App\Filament\Resources;
 
+use App\Enum\Employee\Education;
 use App\Filament\Resources\JobVacancyResource\Pages;
 use App\Filament\Resources\JobVacancyResource\RelationManagers;
+use App\Models\Department;
 use App\Models\JobVacancy;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -71,13 +74,17 @@ class JobVacancyResource extends Resource
                         Forms\Components\Section::make()
                             ->schema([
                                 Forms\Components\DatePicker::make('post_date')
+                                    ->default(now())
                                     ->required(),
                                 Forms\Components\DatePicker::make('close_date'),
                                 Forms\Components\TextInput::make('salary')
                                     ->prefix('Rp. ')
                                     ->numeric(),
-                                Forms\Components\TextInput::make('dept_div')
-                                    ->maxLength(255),
+                                Forms\Components\Select::make('department_id')
+                                    ->options(Department::all()->pluck('name', 'id'))
+                                    ->searchable()
+                                    ->label('Department')
+                                    ->required(),
                                 Forms\Components\Select::make('contract_type')
                                     ->options([
                                         1 => 'Internship',
@@ -91,8 +98,8 @@ class JobVacancyResource extends Resource
                                         1 => 'WFO',
                                         2 => 'Remote',
                                     ]),
-                                Forms\Components\TextInput::make('minimum_education')
-                                    ->maxLength(255),
+                                Select::make('minimum_education')
+                                    ->options(Education::labels()),
                                 Forms\Components\TextInput::make('years_of_experience')
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('location')
@@ -119,7 +126,7 @@ class JobVacancyResource extends Resource
                     ->prefix('Rp. ')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('dept_div')
+                Tables\Columns\TextColumn::make('department.name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('contract_type_str')
                     ->sortable()

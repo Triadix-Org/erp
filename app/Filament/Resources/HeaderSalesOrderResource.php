@@ -12,6 +12,8 @@ use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -67,8 +69,19 @@ class HeaderSalesOrderResource extends Resource
                             ->searchable()
                             ->options(Product::pluck('name', 'id'))
                             ->required(),
-
                         TextInput::make('qty')
+                            ->required()
+                            ->reactive()
+                            ->debounce()
+                            ->afterStateUpdated(function (Set $set, $state, Get $get) {
+                                $productId = $get('product_id');
+                                $product = Product::find($productId);
+                                if ($product) {
+                                    $calculatedPrice = $product->price * $state;
+                                    // dd($calculatedPrice);
+                                    $set('total_amount', $calculatedPrice);
+                                }
+                            })
                             ->numeric(),
                     ])
                     ->reorderable()
@@ -146,8 +159,11 @@ class HeaderSalesOrderResource extends Resource
             ])
             ->actions([
                 ActionGroup::make([
-                    Tables\Actions\EditAction::make(),
-                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\EditAction::make()
+                        ->color('warning')
+                        ->visible(fn($record) => $record->app_manager == 0),
+                    Tables\Actions\DeleteAction::make()
+                        ->visible(fn($record) => $record->app_manager == 0),
                     Action::make('setStatusProcess')
                         ->label('Process Order')
                         ->icon('heroicon-o-check')
@@ -263,7 +279,7 @@ class HeaderSalesOrderResource extends Resource
 
             $record = HeaderSalesOrder::where('code', $orderNumber)->first();
             $record->app_manager = 1;
-            $record->app_manager_by = Auth::user()->email;
+            $record->app_manager_by = Auth::user()->id;
             $record->save();
 
             DB::commit();

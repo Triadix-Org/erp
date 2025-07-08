@@ -14,6 +14,7 @@ class JobVacancyController extends Controller
     public function __invoke()
     {
         $vacancy = JobVacancy::where('status', 1)->get();
+        // dd($vacancy);
         return view('guest.job-vacancy.index', compact('vacancy'));
     }
 
