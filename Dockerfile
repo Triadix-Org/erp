@@ -1,7 +1,7 @@
 FROM node:20 as assets
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm ci
 COPY . .
 RUN npm run build
 
@@ -26,5 +26,5 @@ COPY . .
 
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader --ignore-platform-req=ext-intl --ignore-platform-req=ext-gd
 
-# Install npm dependencies for development
+# Install npm dependencies for development (including devDependencies)
 RUN npm install
