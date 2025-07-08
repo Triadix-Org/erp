@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Enum\Accounting\JournalSource;
 use App\Enum\Accounting\JournalStatus;
+use App\Enum\Accounting\JournalType;
 use App\Filament\Resources\JournalEntryResource\Pages;
 use App\Filament\Resources\JournalEntryResource\RelationManagers;
 use App\Models\AccountingPeriods;
@@ -42,56 +43,70 @@ class JournalEntryResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-document-plus';
     protected static ?string $navigationGroup = 'Accounting';
+    protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Section::make()
-                    ->columns(2)
-                    ->schema([
-                        DatePicker::make('date')
-                            ->label('Tanggal')
-                            ->default(now())
-                            ->required(),
-                        Select::make('status')
-                            ->required()
-                            ->default(0)
-                            ->options([
-                                0 => 'Unposted',
-                                1 => 'Posted',
-                            ]),
-                        Select::make('source')
-                            ->options(JournalSource::labels())
-                            ->reactive()
-                            ->label('Sumber'),
-                        Select::make('source_id')
-                            ->label('Referensi')
-                            ->options(function (Get $get) {
-                                $source = $get('source');
+                Grid::make()
+                ->columns(2)
+                ->schema([
+                    Section::make()
+                    ->columnSpan(1)
+                        ->schema([
+                            DatePicker::make('date')
+                                ->label('Tanggal')
+                                ->default(now())
+                                ->required(),
+                            Select::make('source')
+                                ->options(JournalSource::labels())
+                                ->reactive()
+                                ->label('Sumber'),
+                            Select::make('source_id')
+                                ->label('Referensi')
+                                ->options(function (Get $get) {
+                                    $source = $get('source');
 
-                                if ($source == JournalSource::PO->value) {
-                                    return HeaderPurchaseOrder::pluck('code', 'id');
-                                } else if ($source == JournalSource::SALES->value) {
-                                    return HeaderSalesOrder::pluck('code', 'id');
-                                } else if ($source == JournalSource::PAYROLL->value) {
-                                    return Payroll::get()->mapWithKeys(function ($payroll) {
-                                        return [
-                                            $payroll->id => "{$payroll->month} {$payroll->year}",
-                                        ];
-                                    });
-                                }
+                                    if ($source == JournalSource::PO->value) {
+                                        return HeaderPurchaseOrder::pluck('code', 'id');
+                                    } else if ($source == JournalSource::SALES->value) {
+                                        return HeaderSalesOrder::pluck('code', 'id');
+                                    } else if ($source == JournalSource::PAYROLL->value) {
+                                        return Payroll::get()->mapWithKeys(function ($payroll) {
+                                            return [
+                                                $payroll->id => "{$payroll->month} {$payroll->year}",
+                                            ];
+                                        });
+                                    }
 
-                                return [];
-                            }),
-                        TextInput::make('ref')
-                            ->label('Nomor Referensi')
-                            ->default(0),
-                        Select::make('accounting_periods_id')
-                            ->label('Periode')
-                            ->required()
-                            ->options(AccountingPeriods::pluck('name', 'id'))
-                    ]),
+                                    return [];
+                                }),
+                            TextInput::make('ref')
+                                ->label('Nomor Referensi')
+                                ->default(0),
+                        ]),
+                    Section::make()
+                    ->columnSpan(1)
+                        ->schema([
+                            Select::make('status')
+                                ->required()
+                                ->default(0)
+                                ->options([
+                                    0 => 'Unposted',
+                                    1 => 'Posted',
+                                ]),
+                            Select::make('accounting_periods_id')
+                                ->label('Periode')
+                                ->required()
+                                ->options(AccountingPeriods::open()->pluck('name', 'id')),
+                            Select::make('type')
+                                ->options(JournalType::labels())
+                                ->searchable()
+                                ->required()
+                                ->label('Tipe Jurnal')
+                        ])
+                ]),
                 TableRepeater::make('details')
                     ->label(false)
                     ->relationship('details')
@@ -141,10 +156,10 @@ class JournalEntryResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('ref')
-                    ->label('Nomor Referensi')
-                    ->searchable()
-                    ->sortable(),
+                TextColumn::make('type')
+                    ->formatStateUsing(fn($state) => JournalType::tryFrom($state)?->labels() ?? '-')
+                    ->label('Tipe')
+                    ->searchable(),
                 TextColumn::make('date')
                     ->label('Tanggal')
                     ->date()
@@ -153,9 +168,11 @@ class JournalEntryResource extends Resource
                     ->label('Sumber')
                     ->badge()
                     ->formatStateUsing(fn($state) => JournalSource::tryFrom($state)?->label() ?? '-')
+                    ->default('-')
                     ->color('primary'),
                 TextColumn::make('source_id')
                     ->label('Referensi')
+                    ->default('-')
                     ->formatStateUsing(function ($state, $record) {
                         return match ($record->source) {
                             JournalSource::PO->value => optional(HeaderPurchaseOrder::find($state))->code ?? '-',

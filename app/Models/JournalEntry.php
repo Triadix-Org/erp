@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enum\Accounting\JournalType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,6 +16,10 @@ class JournalEntry extends Model
 
     public $timestamps = true;
     protected $guarded = [];
+
+    protected $casts = [
+        'type' => JournalType::class
+    ];
 
     public function details(): HasMany
     {

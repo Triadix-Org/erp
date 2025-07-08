@@ -20,6 +20,7 @@ class GeneralLedger extends Page implements HasForms
 
     protected static string $view = 'filament.pages.general-ledger';
     protected static ?string $navigationGroup = 'Accounting';
+    protected static ?int $navigationSort = 3;
 
     public $periods;
     public $openBalance = 0;
