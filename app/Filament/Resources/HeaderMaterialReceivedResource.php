@@ -3,17 +3,11 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\HeaderMaterialReceivedResource\Pages;
-use App\Filament\Resources\HeaderMaterialReceivedResource\RelationManagers;
-use App\Models\DetailMaterialReceived;
-use App\Models\DetailPurchaseOrder;
 use App\Models\HeaderMaterialReceived;
 use App\Models\HeaderPurchaseOrder;
-use App\Models\Product;
 use App\Models\Supplier;
 use Carbon\Carbon;
 use Filament\Forms;
-use Filament\Forms\Components\Card;
-use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -40,9 +34,9 @@ class HeaderMaterialReceivedResource extends Resource
     protected static ?string $model = HeaderMaterialReceived::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationLabel = 'Material Received Note';
+    protected static ?string $pluralLabel = 'Tanda Terima Barang';
     protected static ?string $navigationGroup = 'Purchasing';
-    protected static ?string $label = 'Material Received Note';
+    protected static ?string $label = 'Tanda Terima Barang';
 
     public static function form(Form $form): Form
     {

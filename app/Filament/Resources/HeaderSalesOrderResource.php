@@ -22,9 +22,6 @@ use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Table;
 use Icetalker\FilamentTableRepeater\Forms\Components\TableRepeater;
-use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -34,9 +31,9 @@ class HeaderSalesOrderResource extends Resource
     protected static ?string $model = HeaderSalesOrder::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-banknotes';
-    protected static ?string $navigationLabel = 'Orders';
+    protected static ?string $pluralLabel = 'Pesanan';
     protected static ?string $navigationGroup = 'Sales & Marketing';
-    protected static ?string $label = 'Orders';
+    protected static ?string $label = 'Pesanan';
 
     public static function form(Form $form): Form
     {

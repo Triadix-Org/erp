@@ -44,6 +44,8 @@ class EmployeeResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
     protected static ?string $navigationGroup = 'Master';
+    protected static ?string $label = 'Pegawai';
+    protected static ?string $pluralLabel = 'Pegawai';
 
     public static function form(Form $form): Form
     {

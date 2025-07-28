@@ -30,8 +30,10 @@ class IncomeResource extends Resource
 {
     protected static ?string $model = Income::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-document-chart-bar';
+    protected static ?string $navigationIcon = 'heroicon-o-document-plus';
     protected static ?string $navigationGroup = 'Finance';
+    protected static ?string $label = 'Pendapatan';
+    protected static ?string $pluralLabel = 'Pendapatan';
 
     public static function form(Form $form): Form
     {

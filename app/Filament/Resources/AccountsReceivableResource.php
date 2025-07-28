@@ -34,6 +34,8 @@ class AccountsReceivableResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
     protected static ?string $navigationGroup = 'Finance';
+    protected static ?string $label = 'Piutang';
+    protected static ?string $pluralLabel = 'Piutang';
 
     public static function form(Form $form): Form
     {
