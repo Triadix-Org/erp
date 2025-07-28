@@ -19,8 +19,8 @@ class Settings extends Page implements HasForms
 
     protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
     protected static string $view = 'filament.pages.settings';
-    protected static ?string $navigationGroup = 'Setting';
-    protected static ?string $title = 'Company Profile';
+    protected static ?string $navigationGroup = 'Pengaturan';
+    protected static ?string $title = 'Profil Perusahaan';
 
     public $company_name;
     public $company_code;

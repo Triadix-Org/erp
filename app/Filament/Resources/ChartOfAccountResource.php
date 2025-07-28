@@ -28,7 +28,9 @@ class ChartOfAccountResource extends Resource
     protected static ?string $model = ChartOfAccount::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-chart-bar';
-    protected static ?string $navigationGroup = 'Master Accounting';
+    protected static ?string $navigationGroup = 'Master Akuntansi';
+    protected static ?string $label = 'Chart of Account (COA)';
+    protected static ?string $pluralLabel = 'Chart of Accounts (COA)';
 
     public static function form(Form $form): Form
     {

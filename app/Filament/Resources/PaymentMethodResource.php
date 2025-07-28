@@ -19,6 +19,8 @@ class PaymentMethodResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-credit-card';
     protected static ?string $navigationGroup = 'Master';
+    protected static ?string $label = 'Metode Pembayaran';
+    protected static ?string $pluralLabel = 'Metode Pembayaran';
 
     public static function form(Form $form): Form
     {

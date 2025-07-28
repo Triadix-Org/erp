@@ -30,6 +30,8 @@ class PayrollResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $navigationGroup = 'Human Resource';
+    protected static ?string $label = 'Penggajian';
+    protected static ?string $pluralLabel = 'Penggajian';
 
     public static function form(Form $form): Form
     {

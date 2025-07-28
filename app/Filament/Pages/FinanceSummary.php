@@ -10,6 +10,7 @@ class FinanceSummary extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-chart-pie';
     protected static ?string $navigationGroup = 'Finance';
+    protected static ?string $title = 'Ringkasan Keuangan';
 
     protected static string $view = 'filament.pages.finance-summary';
 

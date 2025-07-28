@@ -52,6 +52,8 @@ class InvoiceResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
     protected static ?string $navigationGroup = 'Sales & Marketing';
+    protected static ?string $label = 'Penjualan';
+    protected static ?string $pluralLabel = 'Penjualan';
 
     public $total_amount = 0;
 

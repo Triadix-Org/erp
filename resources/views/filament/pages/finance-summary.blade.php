@@ -2,7 +2,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <div class="grid grid-cols-3 gap-8">
         <div class="bg-blue-100 dark:bg-gray-800 p-6 rounded-xl">
-            <div class="text-lg mb-3">Total income this month</div>
+            <div class="text-lg mb-3">Total pendapatan bulan ini</div>
             <div class="flex justify-between items-center">
                 <div class="text-left">
                     <div class="text-2xl font-bold text-blue-700 dark:text-blue-300">{{ $totalIncome }}</div>
@@ -17,7 +17,7 @@
             </div>
         </div>
         <div class="bg-blue-100 dark:bg-gray-800 p-6 rounded-xl">
-            <div class="text-lg mb-3">Total outcome this month</div>
+            <div class="text-lg mb-3">Total pengeluaran bulan ini</div>
             <div class="flex justify-between items-center">
                 <div class="text-left">
                     <div class="text-2xl font-bold text-blue-700 dark:text-blue-300">{{ $totalOutcome }}</div>
@@ -33,7 +33,7 @@
             </div>
         </div>
         <div class="bg-blue-100 dark:bg-gray-800 p-6 rounded-xl">
-            <div class="text-lg mb-3">Profit this month</div>
+            <div class="text-lg mb-3">Laba bulan ini</div>
             <div class="flex justify-between items-center">
                 <div class="text-left">
                     <div class="text-2xl font-bold text-blue-700 dark:text-blue-300">{{ $totalProfit }}</div>

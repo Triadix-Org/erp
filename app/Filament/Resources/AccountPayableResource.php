@@ -40,6 +40,8 @@ class AccountPayableResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
     protected static ?string $navigationGroup = 'Finance';
+    protected static ?string $label = 'Hutang';
+    protected static ?string $pluralLabel = 'Hutang';
 
     public static function form(Form $form): Form
     {

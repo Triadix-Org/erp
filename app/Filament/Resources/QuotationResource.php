@@ -33,6 +33,8 @@ class QuotationResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
     protected static ?string $navigationGroup = 'Sales & Marketing';
+    protected static ?string $label = 'Penawaran';
+    protected static ?string $pluralLabel = 'Penawaran';
 
     public static function form(Form $form): Form
     {

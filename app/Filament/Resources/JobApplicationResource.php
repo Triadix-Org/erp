@@ -28,6 +28,8 @@ class JobApplicationResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-briefcase';
     protected static ?string $navigationGroup = 'Human Resource';
+    protected static ?string $label = 'Lamaran Masuk';
+    protected static ?string $pluralLabel = 'Lamaran Masuk';
 
     public static function form(Form $form): Form
     {

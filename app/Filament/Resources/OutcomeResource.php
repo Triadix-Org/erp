@@ -31,8 +31,10 @@ class OutcomeResource extends Resource
 {
     protected static ?string $model = Outcome::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-document-minus';
     protected static ?string $navigationGroup = 'Finance';
+    protected static ?string $label = 'Pengeluaran';
+    protected static ?string $pluralLabel = 'Pengeluaran';
 
     public static function form(Form $form): Form
     {
