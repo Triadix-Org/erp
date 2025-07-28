@@ -75,12 +75,14 @@ class HeaderSalesOrderResource extends Resource
                                 $product = Product::find($productId);
                                 if ($product) {
                                     $calculatedPrice = $product->price * $state;
-                                    // dd($calculatedPrice);
                                     $set('total_amount', $calculatedPrice);
                                 }
                             })
                             ->numeric(),
                     ])
+                    ->afterStateUpdated(function (Set $set, $state, Get $get) {
+                        self::calculateTotalAmount($get, $set);
+                    })
                     ->reorderable()
                     ->addActionLabel('Add')
                     ->columnSpan('full'),
@@ -90,6 +92,23 @@ class HeaderSalesOrderResource extends Resource
                     ->prefix('Rp.')
                     ->default(0),
             ]);
+    }
+
+    public static function calculateTotalAmount(Get $get, Set $set): int
+    {
+        $details = $get('details');
+        $totalAmount = 0;
+
+        foreach ($details as $detail) {
+            $product = Product::find($detail['product_id']);
+            if ($product) {
+                $totalAmount += $product->price * $detail['qty'];
+            }
+        }
+
+        $set('total_amount', $totalAmount);
+
+        return $totalAmount;
     }
 
     public static function table(Table $table): Table
