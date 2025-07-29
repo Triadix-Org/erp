@@ -19,9 +19,9 @@ return new class extends Migration
             $table->string('phone');
             $table->string('email');
             $table->date('date_of_birth');
-            $table->integer('education')->nullable();
+            $table->string('education')->nullable();
             $table->integer('years_of_experience')->nullable();
-            $table->string('resume');
+            $table->string('resume')->nullable();
             $table->string('application_letter')->nullable();
             $table->string('certificate')->nullable();
             $table->timestamps();
