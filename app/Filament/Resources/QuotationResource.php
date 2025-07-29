@@ -7,6 +7,7 @@ use App\Filament\Resources\QuotationResource\RelationManagers;
 use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Quotation;
+use App\Models\Tax;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Grid;
@@ -100,18 +101,35 @@ class QuotationResource extends Resource
                             }),
                         Grid::make(2)
                             ->schema([
-                                TextInput::make('tax')
-                                    ->numeric()
+                                Select::make('tax_id')
+                                    ->label('Tax Type')
                                     ->required()
+                                    ->options(Tax::pluck('name', 'id'))
                                     ->reactive()
-                                    ->afterStateUpdated(function ($state, Set $set, Get $get) {
+                                    ->searchable()
+                                    ->afterStateUpdated(function (Set $set, Get $get, $state) {
+                                        $tax = Tax::find($state);
+                                        $totalTax = $get('total_amount') * ($tax->rate / 100);
+                                        if ($tax) {
+                                            $set('total_tax', $totalTax);
+                                        } else {
+                                            $set('total_tax', 0);
+                                        }
+                                        self::updatedDetails($set, $get);
+                                    }),
+                                TextInput::make('total_tax')
+                                    ->numeric()
+                                    ->reactive()
+                                    ->afterStateUpdated(function (Set $set, Get $get) {
                                         self::updatedDetails($set, $get);
                                     })
+                                    ->debounce(1000)
                                     ->default(0),
                                 TextInput::make('shipment_price')
                                     ->numeric()
                                     ->required()
                                     ->reactive()
+                                    ->debounce(1000)
                                     ->afterStateUpdated(function ($state, Set $set, Get $get) {
                                         self::updatedDetails($set, $get);
                                     })
@@ -120,6 +138,7 @@ class QuotationResource extends Resource
                                     ->numeric()
                                     ->required()
                                     ->reactive()
+                                    ->debounce(1000)
                                     ->afterStateUpdated(function ($state, Set $set, Get $get) {
                                         self::updatedDetails($set, $get);
                                     })
@@ -137,7 +156,7 @@ class QuotationResource extends Resource
     {
         $details = collect($get('detail'))->filter(fn($item) => !empty($item['product_id']) && !empty($item['qty']));
         $prices = Product::find($details->pluck('product_id'))->pluck('price', 'id');
-        $tax = $get('tax') == null ? 0 : $get('tax');
+        $tax = $get('total_tax') == null ? 0 : $get('total_tax');
         $shipPrice = $get('shipment_price') == null ? 0 : $get('shipment_price');
         $otherPrice = $get('other_price') == null ? 0 : $get('other_price');
 

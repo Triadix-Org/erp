@@ -130,6 +130,7 @@ class InvoiceResource extends Resource
                                     ])
                                     ->reorderable()
                                     ->addable(false)
+                                    ->deletable(false)
                                     ->columnSpan('full')
                                     ->colStyles(function () {
                                         return [
@@ -142,21 +143,21 @@ class InvoiceResource extends Resource
                                 Grid::make(2)
                                     ->schema([
                                         Select::make('tax_id')
-                                        ->label('Tax Type')
-                                        ->required()
-                                        ->options(Tax::pluck('name', 'id'))
-                                        ->reactive()
-                                        ->searchable()
-                                        ->afterStateUpdated(function (Set $set, Get $get, $state) {
-                                            $tax = Tax::find($state);
-                                            $totalTax = $get('total_amount') * ($tax->rate / 100);
-                                            if ($tax) {
-                                                $set('total_tax', $totalTax);
-                                            } else {
-                                                $set('total_tax', 0);
-                                            }
-                                            self::updatedDetails($set, $get);
-                                        }),
+                                            ->label('Tax Type')
+                                            ->required()
+                                            ->options(Tax::pluck('name', 'id'))
+                                            ->reactive()
+                                            ->searchable()
+                                            ->afterStateUpdated(function (Set $set, Get $get, $state) {
+                                                $tax = Tax::find($state);
+                                                $totalTax = $get('total_amount') * ($tax->rate / 100);
+                                                if ($tax) {
+                                                    $set('total_tax', $totalTax);
+                                                } else {
+                                                    $set('total_tax', 0);
+                                                }
+                                                self::updatedDetails($set, $get);
+                                            }),
                                         TextInput::make('total_tax')
                                             ->numeric()
                                             ->reactive()
