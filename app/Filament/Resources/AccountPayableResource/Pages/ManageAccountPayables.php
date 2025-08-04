@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\AccountPayableResource\Pages;
 
 use App\Filament\Resources\AccountPayableResource;
-use Filament\Actions;
+use App\Filament\Resources\AccountPayableResource\Widgets\AccountPayableWidget;
 use Filament\Resources\Pages\ManageRecords;
 
 class ManageAccountPayables extends ManageRecords
@@ -14,6 +14,13 @@ class ManageAccountPayables extends ManageRecords
     {
         return [
             // Actions\CreateAction::make(),
+        ];
+    }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            AccountPayableWidget::class,
         ];
     }
 }

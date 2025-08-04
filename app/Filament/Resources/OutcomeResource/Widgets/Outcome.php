@@ -17,8 +17,6 @@ class Outcome extends BaseWidget
             Stat::make('Total', $formattedAmount)
                 ->icon('heroicon-m-chart-bar')
                 ->color('info'),
-            Stat::make('Bounce rate', '21%'),
-            Stat::make('Average time on page', '3:12'),
         ];
     }
 }
