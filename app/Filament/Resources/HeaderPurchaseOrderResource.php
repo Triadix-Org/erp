@@ -113,6 +113,8 @@ class HeaderPurchaseOrderResource extends Resource
                                 Select::make('product_id')
                                     ->label('Product')
                                     ->reactive()
+                                    ->preload()
+                                    ->optionsLimit(6)
                                     ->relationship(
                                         name: 'product',
                                         titleAttribute: 'name',
@@ -137,6 +139,7 @@ class HeaderPurchaseOrderResource extends Resource
 
                                 TextInput::make('qty')
                                     ->numeric()
+                                    ->debounce(1000)
                                     ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                         $qty = $get('qty');
                                         $price = $get('price');

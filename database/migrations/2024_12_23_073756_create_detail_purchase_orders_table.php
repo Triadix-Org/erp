@@ -18,8 +18,8 @@ return new class extends Migration
             $table->foreignIdFor(HeaderPurchaseOrder::class);
             $table->foreignIdFor(Product::class);
             $table->integer('qty');
-            $table->integer('disc_rp');
-            $table->integer('tax_rp');
+            $table->integer('disc_rp')->nullable();
+            $table->integer('tax_rp')->nullable();
             $table->integer('total');
             $table->timestamps();
             $table->softDeletes();
