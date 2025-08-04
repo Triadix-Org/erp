@@ -186,7 +186,6 @@ class AccountPayableResource extends Resource
                                 FileUpload::make('attach')
                                     ->label('Proof of Payment')
                                     ->directory('accounts-payable')
-                                    ->image()
                                     ->openable()
                                     ->downloadable()
                                     ->required()
