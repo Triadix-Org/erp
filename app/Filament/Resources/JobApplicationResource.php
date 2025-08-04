@@ -155,7 +155,6 @@ class JobApplicationResource extends Resource
     public static function setStatus($id, $status)
     {
         try {
-            DB::beginTransaction();
 
             $record = JobApplication::find($id);
             if ($record) {
@@ -163,13 +162,11 @@ class JobApplicationResource extends Resource
                 $record->save();
             }
 
-            DB::commit();
             Notification::make()
                 ->title('Saved successfully')
                 ->success()
                 ->send();
         } catch (Throwable $th) {
-            DB::rollBack();
             Notification::make()
                 ->title('Opps.. Something went wrong!')
                 ->body($th->getMessage())

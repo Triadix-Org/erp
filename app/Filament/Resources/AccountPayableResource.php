@@ -6,6 +6,7 @@ use App\Enum\OutcomeType;
 use App\Enum\PaymentStatus;
 use App\Filament\Resources\AccountPayableResource\Pages;
 use App\Filament\Resources\AccountPayableResource\RelationManagers;
+use App\Filament\Resources\AccountPayableResource\Widgets\AccountPayableWidget;
 use App\Models\AccountsPayable;
 use App\Models\HeaderPurchaseOrder;
 use App\Models\Outcome;
@@ -236,6 +237,13 @@ class AccountPayableResource extends Resource
     {
         return [
             'index' => Pages\ManageAccountPayables::route('/'),
+        ];
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            AccountPayableWidget::class
         ];
     }
 }
