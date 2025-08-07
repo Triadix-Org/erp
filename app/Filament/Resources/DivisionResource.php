@@ -27,6 +27,8 @@ class DivisionResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $navigationGroup = 'Master';
+    protected static ?string $label = 'Divisi';
+    protected static ?string $pluralLabel = 'Divisi';
 
     public static function form(Form $form): Form
     {

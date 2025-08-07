@@ -26,6 +26,8 @@ class WarehouseResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-building-storefront';
     protected static ?string $navigationGroup = 'Master';
+    protected static ?string $label = 'Gudang';
+    protected static ?string $pluralLabel = 'Gudang';
 
     public static function form(Form $form): Form
     {

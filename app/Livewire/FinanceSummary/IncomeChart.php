@@ -6,7 +6,7 @@ use Filament\Widgets\ChartWidget;
 
 class IncomeChart extends ChartWidget
 {
-    protected static ?string $heading = 'Income';
+    protected static ?string $heading = 'Pendapatan';
 
     protected function getData(): array
     {

@@ -7,15 +7,11 @@ use App\Filament\Resources\HeaderRequestOrderResource\RelationManagers;
 use App\Models\HeaderRequestOrder;
 use App\Models\Product;
 use Carbon\Carbon;
-use Filament\Forms;
-use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -25,8 +21,6 @@ use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Table;
 use Icetalker\FilamentTableRepeater\Forms\Components\TableRepeater;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -36,9 +30,9 @@ class HeaderRequestOrderResource extends Resource
     protected static ?string $model = HeaderRequestOrder::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationLabel = 'Material Request';
-    protected static ?string $navigationGroup = 'Production';
-    protected static ?string $label = 'Material Request';
+    protected static ?string $pluralLabel = 'Permintaan Pengadaan';
+    protected static ?string $navigationGroup = 'Produksi';
+    protected static ?string $label = 'Permintaan Pengadaan';
 
     public static function form(Form $form): Form
     {

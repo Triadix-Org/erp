@@ -6,6 +6,7 @@ use App\Enum\OutcomeType;
 use App\Enum\PaymentStatus;
 use App\Filament\Resources\AccountPayableResource\Pages;
 use App\Filament\Resources\AccountPayableResource\RelationManagers;
+use App\Filament\Resources\AccountPayableResource\Widgets\AccountPayableWidget;
 use App\Models\AccountsPayable;
 use App\Models\HeaderPurchaseOrder;
 use App\Models\Outcome;
@@ -40,6 +41,8 @@ class AccountPayableResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
     protected static ?string $navigationGroup = 'Finance';
+    protected static ?string $label = 'Hutang';
+    protected static ?string $pluralLabel = 'Hutang';
 
     public static function form(Form $form): Form
     {
@@ -183,7 +186,6 @@ class AccountPayableResource extends Resource
                                 FileUpload::make('attach')
                                     ->label('Proof of Payment')
                                     ->directory('accounts-payable')
-                                    ->image()
                                     ->openable()
                                     ->downloadable()
                                     ->required()
@@ -234,6 +236,13 @@ class AccountPayableResource extends Resource
     {
         return [
             'index' => Pages\ManageAccountPayables::route('/'),
+        ];
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            AccountPayableWidget::class
         ];
     }
 }

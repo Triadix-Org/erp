@@ -3,7 +3,6 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY . .
-RUN npm run build
 
 FROM php:8.3-fpm
 
@@ -27,4 +26,4 @@ COPY . .
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader --ignore-platform-req=ext-intl --ignore-platform-req=ext-gd
 
 # Install npm dependencies for development (including devDependencies)
-RUN npm install
+RUN npm run build

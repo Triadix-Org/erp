@@ -41,7 +41,9 @@ class StockOpnameResource extends Resource
     protected static ?string $model = StockOpname::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Warehouse';
+    protected static ?string $navigationGroup = 'Gudang';
+    protected static ?string $label = 'Stock Opname';
+    protected static ?string $pluralLabel = 'Stock Opname';
 
     public static function form(Form $form): Form
     {

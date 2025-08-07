@@ -24,6 +24,8 @@ class JobVacancyResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-briefcase';
     protected static ?string $navigationGroup = 'Human Resource';
+    protected static ?string $label = 'Lowongan Pekerjaan';
+    protected static ?string $pluralLabel = 'Lowongan Pekerjaan';
 
     public static function form(Form $form): Form
     {

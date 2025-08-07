@@ -14,6 +14,7 @@ use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
@@ -23,9 +24,8 @@ use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\ActionsPosition;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\DB;
 
 class AccountsReceivableResource extends Resource
@@ -34,18 +34,32 @@ class AccountsReceivableResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
     protected static ?string $navigationGroup = 'Finance';
+    protected static ?string $label = 'Piutang';
+    protected static ?string $pluralLabel = 'Piutang';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                TextInput::make('invoice_id')
+                Select::make('invoice_id')
                     ->required()
-                    ->numeric(),
-                TextInput::make('customer_id')
+                    ->options(function () {
+                        return Invoice::query()
+                            ->where('payment_status', 0)
+                            ->pluck('inv_no', 'id');
+                    })
+                    ->searchable()
+                    ->label('Invoice'),
+                Select::make('customer_id')
                     ->required()
-                    ->numeric(),
+                    ->options(function () {
+                        return Customer::query()
+                            ->pluck('name', 'id');
+                    })
+                    ->searchable()
+                    ->label('Customer'),
                 DatePicker::make('date')
+                    ->default(now())
                     ->required(),
                 DatePicker::make('due_date')
                     ->required(),
@@ -53,13 +67,11 @@ class AccountsReceivableResource extends Resource
                     ->required()
                     ->numeric()
                     ->default(0),
-                TextInput::make('status')
+                Select::make('status')
+                    ->default(PaymentStatus::UNPAID->value)
+                    ->options(PaymentStatus::labels())
                     ->required()
-                    ->numeric()
-                    ->default(0),
-                TextInput::make('attach')
-                    ->maxLength(255),
-                DatePicker::make('payment_date'),
+                    ->label('Payment Status')
             ]);
     }
 
@@ -103,7 +115,8 @@ class AccountsReceivableResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                SelectFilter::make('status')
+                    ->options(PaymentStatus::labels())
             ])
             ->actions([
                 ActionGroup::make([
@@ -112,7 +125,7 @@ class AccountsReceivableResource extends Resource
                         ->label('Set to Paid')
                         ->modalHeading('Set Status to Paid')
                         ->icon('heroicon-s-check-circle')
-                        ->visible(fn($record) => $record->status == 0)
+                        ->visible(fn($record) => $record->status != 1)
                         ->form([
                             Section::make()
                                 ->schema([
@@ -161,6 +174,13 @@ class AccountsReceivableResource extends Resource
     {
         return [
             'index' => Pages\ManageAccountsReceivables::route('/'),
+        ];
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            \App\Filament\Resources\AccountReceivableResource\Widgets\AccountReceivableStats::class,
         ];
     }
 }

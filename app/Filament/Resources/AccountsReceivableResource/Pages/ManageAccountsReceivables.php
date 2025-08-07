@@ -16,4 +16,11 @@ class ManageAccountsReceivables extends ManageRecords
             Actions\CreateAction::make(),
         ];
     }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            \App\Filament\Resources\AccountReceivableResource\Widgets\AccountReceivableStats::class,
+        ];
+    }
 }

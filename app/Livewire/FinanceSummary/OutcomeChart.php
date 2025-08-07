@@ -6,7 +6,7 @@ use Filament\Widgets\ChartWidget;
 
 class OutcomeChart extends ChartWidget
 {
-    protected static ?string $heading = 'Outcome';
+    protected static ?string $heading = 'Pengeluaran';
 
     protected function getData(): array
     {

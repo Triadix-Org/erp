@@ -22,9 +22,6 @@ use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Table;
 use Icetalker\FilamentTableRepeater\Forms\Components\TableRepeater;
-use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -34,9 +31,9 @@ class HeaderSalesOrderResource extends Resource
     protected static ?string $model = HeaderSalesOrder::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-banknotes';
-    protected static ?string $navigationLabel = 'Orders';
+    protected static ?string $pluralLabel = 'Pesanan';
     protected static ?string $navigationGroup = 'Sales & Marketing';
-    protected static ?string $label = 'Orders';
+    protected static ?string $label = 'Pesanan';
 
     public static function form(Form $form): Form
     {
@@ -78,12 +75,14 @@ class HeaderSalesOrderResource extends Resource
                                 $product = Product::find($productId);
                                 if ($product) {
                                     $calculatedPrice = $product->price * $state;
-                                    // dd($calculatedPrice);
                                     $set('total_amount', $calculatedPrice);
                                 }
                             })
                             ->numeric(),
                     ])
+                    ->afterStateUpdated(function (Set $set, $state, Get $get) {
+                        self::calculateTotalAmount($get, $set);
+                    })
                     ->reorderable()
                     ->addActionLabel('Add')
                     ->columnSpan('full'),
@@ -93,6 +92,23 @@ class HeaderSalesOrderResource extends Resource
                     ->prefix('Rp.')
                     ->default(0),
             ]);
+    }
+
+    public static function calculateTotalAmount(Get $get, Set $set): int
+    {
+        $details = $get('details');
+        $totalAmount = 0;
+
+        foreach ($details as $detail) {
+            $product = Product::find($detail['product_id']);
+            if ($product) {
+                $totalAmount += $product->price * $detail['qty'];
+            }
+        }
+
+        $set('total_amount', $totalAmount);
+
+        return $totalAmount;
     }
 
     public static function table(Table $table): Table
