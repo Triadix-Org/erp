@@ -17,6 +17,8 @@ class FinanceSummary extends Page
     public $totalIncome;
     public $totalOutcome;
     public $totalProfit;
+    public ?string $accountPayables = null;
+    public ?string $totalReceivables = null;
 
     public function mount(): void
     {
@@ -38,5 +40,15 @@ class FinanceSummary extends Page
         $profit = $income - $outcome;
         $formattedProfit = 'Rp ' . number_format($profit, 0, ',', '.');
         $this->totalProfit = $formattedProfit;
+
+        $accountPayables = \App\Models\AccountsPayable::where('status', 0)
+            ->whereMonth('date', date('m'))
+            ->whereYear('date', date('Y'))->sum('amount');
+        $this->accountPayables = format_currency($accountPayables);
+
+        $totalReceivables = \App\Models\AccountsReceivable::where('status', 2)
+            ->whereMonth('date', date('m'))
+            ->whereYear('date', date('Y'))->sum('amount');
+        $this->totalReceivables = format_currency($totalReceivables);
     }
 }
