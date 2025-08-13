@@ -7,6 +7,7 @@ use App\Enum\PaymentStatus;
 use App\Filament\Resources\HeaderPurchaseOrderResource\Pages;
 use App\Filament\Resources\HeaderPurchaseOrderResource\RelationManagers;
 use App\Models\AccountingPeriods;
+use App\Models\AccountsPayable;
 use App\Models\ChartOfAccount;
 use App\Models\DetailJournalEntry;
 use App\Models\DetailRequestOrder;
@@ -302,8 +303,8 @@ class HeaderPurchaseOrderResource extends Resource
                         ->icon('heroicon-o-check')
                         ->color('success')
                         ->requiresConfirmation()
-                        ->modalHeading('Confirmation')
-                        ->modalDescription('Are you sure you want to approve?')
+                        ->modalHeading('Apakah Anda Yakin?')
+                        ->modalDescription('Apakah Anda yakin ingin menyetujui?')
                         ->action(function ($record) {
                             $num = $record->code;
                             self::setStatusOperational($num, 1);
@@ -315,8 +316,8 @@ class HeaderPurchaseOrderResource extends Resource
                         ->icon('heroicon-o-x-mark')
                         ->color('danger')
                         ->requiresConfirmation()
-                        ->modalHeading('Confirmation')
-                        ->modalDescription('Are you sure you want to cancle approve?')
+                        ->modalHeading('Apakah Anda Yakin?')
+                        ->modalDescription('Apakah Anda yakin ingin membatalkan persetujuan?')
                         ->action(function ($record) {
                             $num = $record->code;
                             self::setStatusOperational($num, 0);
@@ -328,8 +329,8 @@ class HeaderPurchaseOrderResource extends Resource
                         ->icon('heroicon-o-check')
                         ->color('success')
                         ->requiresConfirmation()
-                        ->modalHeading('Confirmation')
-                        ->modalDescription('Are you sure you want to approve?')
+                        ->modalHeading('Apakah Anda Yakin?')
+                        ->modalDescription('Apakah Anda yakin ingin menyetujui? Hal ini akan membuat data hutang')
                         ->action(function ($record) {
                             $num = $record->code;
                             self::setStatusFinance($num, 1);
@@ -341,8 +342,8 @@ class HeaderPurchaseOrderResource extends Resource
                         ->icon('heroicon-o-x-mark')
                         ->color('danger')
                         ->requiresConfirmation()
-                        ->modalHeading('Confirmation')
-                        ->modalDescription('Are you sure you want to cancle approve?')
+                        ->modalHeading('Apakah Anda Yakin?')
+                        ->modalDescription('Apakah Anda yakin ingin membatalkan persetujuan?')
                         ->action(function ($record) {
                             $num = $record->code;
                             self::setStatusFinance($num, 0);
@@ -485,6 +486,17 @@ class HeaderPurchaseOrderResource extends Resource
                 $record->app_finance = 1;
                 $record->finance_by  = Auth::user()->email;
                 $record->save();
+
+                $accountPayable = AccountsPayable::where('header_purchase_order_id', $record->id)->first();
+                if (!$accountPayable) {
+                    $accountPayable = new AccountsPayable();
+                    $accountPayable->header_purchase_order_id   = $record->id;
+                    $accountPayable->supplier_id                = $record->supplier_id;
+                    $accountPayable->date                       = now();
+                    $accountPayable->due_date                   = $record->payment_due;
+                    $accountPayable->amount                     = $record->total_amount;
+                    $accountPayable->save();
+                }
             }
 
             DB::commit();

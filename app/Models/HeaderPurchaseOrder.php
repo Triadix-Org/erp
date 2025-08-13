@@ -56,13 +56,13 @@ class HeaderPurchaseOrder extends Model
                 }
 
                 // Buat record di AccountsPayable
-                $accountPayable = new AccountsPayable();
-                $accountPayable->header_purchase_order_id   = $model->id;
-                $accountPayable->supplier_id                = $model->supplier_id;
-                $accountPayable->date                       = now();
-                $accountPayable->due_date                   = $model->payment_due;
-                $accountPayable->amount                     = $model->total_amount;
-                $accountPayable->save();
+                // $accountPayable = new AccountsPayable();
+                // $accountPayable->header_purchase_order_id   = $model->id;
+                // $accountPayable->supplier_id                = $model->supplier_id;
+                // $accountPayable->date                       = now();
+                // $accountPayable->due_date                   = $model->payment_due;
+                // $accountPayable->amount                     = $model->total_amount;
+                // $accountPayable->save();
             });
         });
     }
