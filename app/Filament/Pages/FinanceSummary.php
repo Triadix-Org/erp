@@ -4,10 +4,13 @@ namespace App\Filament\Pages;
 
 use App\Models\Income;
 use App\Models\Outcome;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Pages\Page;
 
 class FinanceSummary extends Page
 {
+    use HasPageShield;
+
     protected static ?string $navigationIcon = 'heroicon-o-chart-pie';
     protected static ?string $navigationGroup = 'Finance';
     protected static ?string $title = 'Ringkasan Keuangan';

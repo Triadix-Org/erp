@@ -6,12 +6,11 @@ use App\Enum\Employee\Gender;
 use App\Enum\Employee\MarriageStatus;
 use App\Enum\Employee\Religion;
 use App\Filament\Resources\EmployeeResource\Pages;
-use App\Filament\Resources\EmployeeResource\RelationManagers;
-use App\Filament\Resources\EmployeeResource\RelationManagers\PersonnelRelationManager;
 use App\Models\Employee;
 use App\Models\Department;
 use App\Models\Division;
 use App\Models\PersonnelData;
+use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\FileUpload;
@@ -22,21 +21,13 @@ use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
-use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Table;
-use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Arr;
-use Throwable;
 
 class EmployeeResource extends Resource
 {
@@ -105,6 +96,11 @@ class EmployeeResource extends Resource
                                                     ->maxLength(255),
                                                 Forms\Components\DatePicker::make('start_working')
                                                     ->required(),
+                                                Select::make('user_id')
+                                                    ->required()
+                                                    ->label('User Account')
+                                                    ->options(User::all()->pluck('name', 'id'))
+                                                    ->searchable(),
                                                 FileUpload::make('photo')
                                                     ->directory('employee/photo')
                                             ])
@@ -132,9 +128,11 @@ class EmployeeResource extends Resource
                                                 TextInput::make('position'),
                                                 Select::make('div')
                                                     ->label('Division')
+                                                    ->required()
                                                     ->options(Division::all()->pluck('name', 'id'))
                                                     ->searchable(),
                                                 Select::make('dept')
+                                                    ->required()
                                                     ->label('Department')
                                                     ->options(Department::all()->pluck('name', 'id'))
                                                     ->searchable(),
@@ -152,22 +150,6 @@ class EmployeeResource extends Resource
                                                         TextInput::make('bank_number'),
                                                         TextInput::make('bank_account_name'),
                                                     ]),
-                                                // Fieldset::make('Documents')
-                                                //     ->schema([
-                                                // FileUpload::make('npwp')
-                                                //     ->directory('employee/npwp')
-                                                //     ->multiple(false),
-                                                // FileUpload::make('personnel.contract_file')
-                                                //     ->directory('employee/contract_file'),
-                                                // FileUpload::make('personnel.ktp')
-                                                //     ->directory('employee/ktp'),
-                                                // FileUpload::make('personnel.cv')
-                                                //     ->directory('employee/cv')
-                                                //     ->openable(),
-                                                // FileUpload::make('personnel.mou')
-                                                //     ->label('Employment agreement')
-                                                //     ->directory('employee/mou'),
-                                                // ])
                                             ])
                                     ])
                             ]),

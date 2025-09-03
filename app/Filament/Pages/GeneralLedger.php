@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Models\AccountingPeriods;
 use App\Models\ChartOfAccount;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -15,6 +16,7 @@ use Filament\Pages\Page;
 class GeneralLedger extends Page implements HasForms
 {
     use InteractsWithForms;
+    use HasPageShield;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
 

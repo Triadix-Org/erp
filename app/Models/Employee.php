@@ -47,9 +47,14 @@ class Employee extends Model
             $itemNumber = $code . str_pad($newNumber, 6, '0', STR_PAD_LEFT);
             $model->nip = $itemNumber;
 
-            // Insert to personnel data
+            // Insert to personnel data with required fields
             $person = new PersonnelData();
             $person->nip = $itemNumber;
+            $person->dept = $model->dept ?? Department::first()?->id;
+            $person->div = $model->div ?? Division::first()?->id;
+            $person->position = $model->position ?? '';
+            $person->position_level = $model->position_level ?? '';
+            $person->employment_status = $model->employment_status ?? '';
             $person->save();
         });
     }
