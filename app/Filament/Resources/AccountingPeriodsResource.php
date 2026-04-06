@@ -13,6 +13,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\ActionsPosition;
@@ -73,15 +74,17 @@ class AccountingPeriodsResource extends Resource
                     ->date()
                     ->sortable()
                     ->searchable(),
-                IconColumn::make('is_closed')
-                    ->icon(fn(int $state): string => match ($state) {
-                        1 => 'heroicon-o-check-circle',
-                        0 => 'heroicon-o-x-circle'
+                TextColumn::make('is_closed')
+                    ->label('Status')
+                    ->badge()
+                    ->color(fn (int $state): string => match ($state) {
+                        1 => 'danger',
+                        0 => 'success',
                     })
-                    ->color(fn(int $state): string => match ($state) {
-                        1 => 'success',
-                        0 => 'danger',
-                    })
+                    ->formatStateUsing(fn (int $state): string => match ($state) {
+                        1 => 'Closed',
+                        0 => 'Open',
+                    }),
             ])
             ->filters([
                 SelectFilter::make('is_closed')
@@ -92,8 +95,10 @@ class AccountingPeriodsResource extends Resource
                     ])
             ])
             ->actions([
-                Tables\Actions\EditAction::make()->color('warning'),
-                Tables\Actions\DeleteAction::make(),
+                ActionGroup::make([
+                    Tables\Actions\EditAction::make()->color('warning'),
+                    Tables\Actions\DeleteAction::make(),
+                ])
             ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
