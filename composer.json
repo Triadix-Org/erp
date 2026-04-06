@@ -8,6 +8,7 @@
         "php": "^8.2",
         "barryvdh/laravel-dompdf": "^3.0",
         "bezhansalleh/filament-shield": "^3.3",
+        "codewithkyrian/filament-date-range": "^1.2",
         "filament/actions": "^3.2",
         "filament/filament": "^3.2",
         "filipfonal/filament-log-manager": "^2.0",

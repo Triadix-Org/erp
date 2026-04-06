@@ -21,13 +21,18 @@ class PersonnelData extends Model
         return $this->belongsTo(Employee::class, 'nip', 'nip');
     }
 
-    public function dept(): BelongsTo
+    public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class, 'dept', 'id');
     }
 
-    public function div(): BelongsTo
+    public function division(): BelongsTo
     {
         return $this->belongsTo(Department::class, 'div', 'id');
+    }
+
+    public function scopeWorkedOverOneYear($query): \Illuminate\Database\Eloquent\Builder
+    {
+        return $query->where('start_working', '<=', now()->subYear());
     }
 }

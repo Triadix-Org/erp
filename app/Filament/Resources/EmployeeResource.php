@@ -9,9 +9,9 @@ use App\Filament\Resources\EmployeeResource\Pages;
 use App\Models\Employee;
 use App\Models\Department;
 use App\Models\Division;
-use App\Models\PersonnelData;
 use App\Models\User;
 use Filament\Forms;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
@@ -34,9 +34,9 @@ class EmployeeResource extends Resource
     protected static ?string $model = Employee::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
-    protected static ?string $navigationGroup = 'Master';
-    protected static ?string $label = 'Pegawai';
-    protected static ?string $pluralLabel = 'Pegawai';
+    protected static ?string $navigationGroup = 'Human Resource';
+    protected static ?string $label = 'Data Pegawai';
+    protected static ?string $pluralLabel = 'Data Pegawai';
 
     public static function form(Form $form): Form
     {
@@ -63,42 +63,50 @@ class EmployeeResource extends Resource
                                                     ->dehydrated(false)
                                                     ->placeholder('Auto'),
                                                 Forms\Components\TextInput::make('name')
+                                                    ->label('Nama Lengkap')
                                                     ->required()
                                                     ->maxLength(255),
                                                 Forms\Components\TextInput::make('nik')
+                                                    ->label('NIK')
                                                     ->required()
                                                     ->maxLength(255),
                                                 Forms\Components\TextInput::make('place_of_birth')
+                                                    ->label('Tempat Lahir')
                                                     ->required()
                                                     ->maxLength(255),
                                                 Forms\Components\DatePicker::make('date_of_birth')
+                                                    ->label('Tanggal Lahir')
                                                     ->required(),
                                                 Select::make('gender')
+                                                    ->label('Jenis Kelamin')
                                                     ->options(Gender::labels())
                                                     ->required(),
                                                 Select::make('religion')
+                                                    ->label('Agama')
                                                     ->options(Religion::labels())
                                                     ->required(),
                                                 Select::make('marriage_status')
+                                                    ->label('Status Pernikahan')
                                                     ->options(MarriageStatus::labels())
                                                     ->required(),
                                                 Forms\Components\TextInput::make('address')
+                                                    ->label('Alamat')
                                                     ->required()
                                                     ->maxLength(255),
                                                 Forms\Components\TextInput::make('phone')
+                                                    ->label('No. Telp')
                                                     ->tel()
                                                     ->maxLength(255),
                                                 Forms\Components\TextInput::make('email')
                                                     ->email()
                                                     ->maxLength(255),
                                                 Forms\Components\TextInput::make('emergency_phone')
+                                                    ->label('No. Telp Darurat')
                                                     ->tel()
                                                     ->maxLength(255),
-                                                Forms\Components\DatePicker::make('start_working')
-                                                    ->required(),
                                                 Select::make('user_id')
                                                     ->required()
-                                                    ->label('User Account')
+                                                    ->label('Akun')
                                                     ->options(User::all()->pluck('name', 'id'))
                                                     ->searchable(),
                                                 FileUpload::make('photo')
@@ -122,33 +130,53 @@ class EmployeeResource extends Resource
                                             ->relationship('personnel')
                                             ->schema([
                                                 TextInput::make('nip')
+                                                    ->label('NIP')
                                                     ->readOnly()
                                                     ->dehydrated(false)
                                                     ->placeholder('Auto'),
-                                                TextInput::make('position'),
+                                                TextInput::make('position')
+                                                    ->label('Posisi')
+                                                    ->required()
+                                                    ->maxLength(255),
                                                 Select::make('div')
-                                                    ->label('Division')
+                                                    ->label('Divisi')
                                                     ->required()
                                                     ->options(Division::all()->pluck('name', 'id'))
                                                     ->searchable(),
                                                 Select::make('dept')
                                                     ->required()
-                                                    ->label('Department')
+                                                    ->label('Departemen')
                                                     ->options(Department::all()->pluck('name', 'id'))
                                                     ->searchable(),
                                                 TextInput::make('position_level')
-                                                    ->label('Position Level'),
+                                                    ->label('Level Posisi'),
                                                 Select::make('employment_status')
+                                                    ->label('Status Kepegawaian')
+                                                    ->required()
                                                     ->options([
                                                         0 => 'Internship',
                                                         1 => 'PKWT',
                                                         2 => 'PKWTT',
                                                     ]),
+                                                DatePicker::make('start_working')
+                                                    ->label('Mulai Bekerja')
+                                                    ->required(),
+                                                DatePicker::make('end_working')
+                                                    ->label('Selesai Bekerja')
+                                                    ->required(),
+                                                TextInput::make('leave_quota')
+                                                    ->label('Kuota Cuti (hari)')
+                                                    ->numeric()
+                                                    ->required(),
                                                 Fieldset::make('Bank Account')
+                                                    ->label('Rekening Bank')
                                                     ->schema([
-                                                        TextInput::make('bank'),
-                                                        TextInput::make('bank_number'),
-                                                        TextInput::make('bank_account_name'),
+                                                        TextInput::make('bank')
+                                                            ->label('Nama Bank'),
+                                                        TextInput::make('bank_number')
+                                                            ->label('Nomor Rekening'),
+                                                        TextInput::make('bank_account_name')
+                                                            ->label('Nama Pemilik Rekening'),
                                                     ]),
                                             ])
                                     ])

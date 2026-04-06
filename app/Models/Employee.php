@@ -58,4 +58,9 @@ class Employee extends Model
             $person->save();
         });
     }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }
