@@ -266,7 +266,6 @@ class InvoiceResource extends Resource
                                         ->label('CoA')
                                         ->required()
                                         ->options(ChartOfAccount::pluck('name', 'id'))
-                                        ->default(11)
                                         ->searchable(),
                                     TextInput::make('description')
                                         ->label('Keterangan'),
